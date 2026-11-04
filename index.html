@@ -50,9 +50,20 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 .cut{padding:8px 0;text-align:center;color:var(--p);font-weight:700;font-size:12px;border-bottom:2px dashed var(--pb)}
 .jump{position:fixed;left:22px;right:22px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:476px;margin:0 auto;height:48px;border:0;border-radius:14px;background:var(--p);color:#fff;font:inherit;font-size:16px;font-weight:700;box-shadow:0 4px 14px rgba(236,107,154,.35)}
 .seg{display:flex;gap:8px;margin:16px 0 8px}.seg button{flex:1;height:46px;border:1.5px solid var(--pb);background:#fff;border-radius:12px;font:inherit;font-weight:700;color:var(--mu)}.seg button.on{background:var(--pl);color:var(--p);border-color:var(--p)}
+/* 실제 신청 기록 */
+.rc{display:block;width:100%;border:0;border-bottom:1px solid #f3e6ec;background:none;text-align:left;font:inherit;color:var(--tx);padding:14px 0}.rc:active{opacity:.6}
+.rc .h{display:flex;align-items:center;gap:8px}.rc .h b{font-size:16px}.rc .h i{font-style:normal;color:var(--mu);font-size:13px}
+.rc .l{display:flex;gap:8px;margin-top:6px;font-size:13px;color:var(--mu)}.rc .l u{text-decoration:none;flex:none;width:58px}.rc .l .rs{color:var(--p);font-weight:700}
+.bdg{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--pl);color:var(--p);white-space:nowrap}.bdg.pr{background:#eef2f8;color:var(--sl)}
+.rn{background:var(--pl);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--mu);margin:12px 0 0}
+.tc{border-radius:14px;padding:14px 16px;margin:12px 0 0;background:#f6f6f6}.tc.rs{background:var(--pl)}
+.tc small{display:block;color:var(--mu);font-size:13px}.tc.rs small{color:var(--p);font-weight:700}.tc b{display:block;font-size:24px;font-variant-numeric:tabular-nums;margin-top:2px;word-break:break-all}
+.tc span{display:block;color:var(--mu);font-size:12px;margin-top:2px}
+.memo{background:#f6f6f6;border-radius:12px;padding:14px 16px;margin:0;white-space:pre-line}
 </style></head><body><main>
 <section id="home"><h1>폼림 연습실</h1>
 <button class="btn" onclick="setup()">정각 폼림 연습 시작</button>
+<button class="btn line" onclick="realList()">실제 신청 기록</button>
 <h3>개인 최고 기록</h3><div class="best" id="best"></div>
 <h3>최근 연습 기록</h3><div id="list"></div></section>
 <section id="setup" hidden><button class="back" onclick="home()">← 뒤로</button><h2>목표 시각 설정</h2><p class="mu">이 시각 정각에 맞춰 제출 버튼을 눌러요.</p>
@@ -77,6 +88,9 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 <section id="lst" hidden><div class="top"><button onclick="home()" aria-label="홈"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="rt" onclick="setup()">다시 연습</button></div>
 <div class="sm" id="sm"></div><div class="gray"><p class="cn" id="cnt"></p><div id="ll"></div></div>
 <button class="jump" id="jump" onclick="goMe()">내 신청으로 이동</button></section>
+<section id="real" hidden><div class="top"><button onclick="home()" aria-label="홈"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<h2>실제 신청 기록</h2><p class="rn">실제 사이트에서 신청한 기록이에요. 적어 둔 원본 그대로 보여주며, <b>실제 결과 시각은 클릭 시각이 아니에요.</b></p><div id="rl"></div></section>
+<section id="rdet" hidden><div class="top"><button onclick="realList()" aria-label="목록"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button></div><div id="rdc"></div></section>
 </main><script>
 const KEY='formrim.v1',$=s=>document.querySelector(s),pad=(n,l=2)=>String(n).padStart(l,'0');let R=null,curN=0,kind='pub';
 // 저장: 기존 기록(formrim.v1)을 그대로 읽고 새 기록만 추가
@@ -151,6 +165,32 @@ function result(r,O){
   +`<small>내 클릭 ${sg(r.click)} · 트래픽 지연 ${Math.round(r.lat)}ms · 서버 접수 ${sg(r.diff)}</small>`;
  $('#cnt').textContent=`${O.length+(r.bad?0:1)}건 제출됨`;$('#ll').innerHTML=h;
  $('#jump').textContent=r.bad?'내 신청으로 이동':`내 신청으로 이동 · ${r.rank}번째`;show('lst')}
+/* 실제 신청 기록 — 사용자가 적은 원본 문자열 그대로 보존 (시간·순위·모집 인원·메모는 가공/보정 금지, 값은 문자열로만 다룸)
+   type: real=실제 신청, practice=연습용 / 값이 없는 항목(rank, cap)은 원본에 없던 것이라 키 자체를 두지 않음 */
+const REAL=[
+ {n:1,type:'real',title:'에이티즈 톡투유',target:'59분 59초 900',env:'PC',result:'22:00:01.343',cap:'400명',memo:'밀리초까지 맞춰서 클릭한 기록. 딜레이가 굉장히 심했음.'},
+ {n:2,type:'practice',title:'에이티즈 톡투유 (연습용)',target:'31분 59초 900',env:'PC',resultLabel:'실제 결과 기록',result:'00:00:00.55',memo:'31분 신청 연습. 정시보다 1분 늦게 신청해서 트래픽이 덜 몰렸음.'},
+ {n:3,type:'real',title:'에이티즈 톡투유',target:'59분 59초 900',env:'PC',result:'12:00:00.113',rank:'22번',cap:'3명',memo:'선발 인원이 적어서 신청자도 상당히 적었음.'},
+ {n:4,type:'real',title:'에이티즈 톡투유',target:'29분 59초 940',env:'PC',result:'23:30:01.983',memo:'딜레이가 유독 심했음. 막방이라 그랬을 가능성이 있음.'},
+ {n:5,type:'practice',title:'에이티즈 톡투유 (연습용)',target:'00분 59초 950',env:'PC',result:'22:00:01.673',memo:'신청 시간보다 1분 늦게 진행해서 트래픽이 덜 몰렸음.'},
+ {n:6,type:'practice',title:'에이티즈 톡투유 (연습용)',target:'06분 59초 950',env:'PC',result:'20:07:00:00.097',memo:'신청 시간보다 7분 늦게 진행해서 트래픽이 거의 몰리지 않았음.'},
+ {n:7,type:'real',title:'별도 이벤트',target:'29분 59초 980',env:'PC',result:'19:30:00.551',memo:'별도 메모 없음.'}
+];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const bdg=r=>r.type==='real'?'<span class="bdg">실제 신청</span>':'<span class="bdg pr">연습</span>';
+function realList(){
+ const grp=(t,name)=>{const L=REAL.filter(r=>r.type===t);
+  return`<h3>${name} (${L.length})</h3>`+L.map(r=>`<button class="rc" onclick="realOpen(${r.n})"><div class="h">${bdg(r)}<b>${esc(r.title)}</b><i>기록 ${r.n}</i></div><div class="l"><u>목표 클릭</u><span>${esc(r.target)}</span></div><div class="l"><u>${esc(r.resultLabel||'실제 결과 시각').replace('실제 ','')}</u><span class="rs">${esc(r.result)}</span></div></button>`).join('')};
+ $('#rl').innerHTML=grp('real','실제 신청')+grp('practice','연습 기록');show('real')}
+function realOpen(n){
+ const r=REAL.find(x=>x.n===n);if(!r)return;
+ $('#rdc').innerHTML=`<p style="margin:8px 0 0">${bdg(r)} <span class="mu">기록 ${r.n}</span></p><h2>${esc(r.title)}</h2>`
+  +`<div class="tc"><small>목표 클릭 시각</small><b>${esc(r.target)}</b><span>내가 이 시각에 클릭하려고 한 목표예요</span></div>`
+  +`<div class="tc rs"><small>${esc(r.resultLabel||'실제 결과 시각')}</small><b>${esc(r.result)}</b><span>클릭 시각이 아니라 신청 결과로 남은 시각이에요</span></div>`
+  +'<div style="margin-top:8px">'+rr('구분',r.type==='real'?'실제 신청':'연습용')+rr('환경',esc(r.env))
+  +(r.rank?rr('결과 순위',esc(r.rank)):'')+(r.cap?rr('모집 인원',esc(r.cap)):'')+'</div>'
+  +`<h3>메모</h3><p class="memo">${esc(r.memo)}</p>`;
+ show('rdet')}
 function quit(){home()}
 home();
 </script></body></html>
