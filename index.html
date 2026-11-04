@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff5f8">
+<title>폼림 연습실</title>
+<style>
+:root{--bg:#fff8fa;--sf:#fff;--ink:#2a2230;--mute:#85798c;--line:#f3dfe6;--p50:#fff0f5;--p100:#ffe1ea;--p300:#ffb1c8;--p500:#e5588a;--p600:#c93d70;--ok:#2f9e6e;--bad:#d64545;--shadow:0 6px 24px rgba(229,88,138,.10);--r:16px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1519;--sf:#251c22;--ink:#f6eef2;--mute:#b6a6af;--line:#3d2d36;--p50:#2f2128;--p100:#44283a;--p300:#8c4a66;--p500:#ef6b9a;--p600:#ff8db2;--ok:#4cc08c;--bad:#ff7a7a;--shadow:0 6px 24px rgba(0,0,0,.35);color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Pretendard','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;word-break:keep-all;overflow-wrap:anywhere}
+.app{max-width:560px;margin:0 auto;padding-block:max(16px,env(safe-area-inset-top)) max(40px,env(safe-area-inset-bottom));padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.view{display:flex;flex-direction:column;gap:14px}
+h1,h2{margin:0;line-height:1.25;text-wrap:balance}
+.note{margin:0;color:var(--mute);font-size:13px}
+.lab,.sm{display:block;font-size:13px;font-weight:700;color:var(--mute);margin:0 0 6px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mt{margin-top:10px}
+.btn{appearance:none;border:0;border-radius:14px;min-height:48px;padding:0 18px;font:inherit;font-weight:700;cursor:pointer;background:var(--p100);color:var(--p600);transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--p500);color:#fff}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn.danger{background:transparent;border:1.5px solid var(--bad);color:var(--bad)}
+.btn.big{min-height:56px;font-size:17px}
+.btn:focus-visible,.chip:focus-visible,.in:focus-visible,.fi:focus-visible,.ib:focus-visible{outline:3px solid var(--p300);outline-offset:2px}
+.in{width:100%;min-height:48px;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font:inherit;font-size:16px;background:var(--sf);color:var(--ink)}
+textarea.in{resize:vertical}
+.card{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.pill{display:inline-block;align-self:flex-start;background:var(--p100);color:var(--p600);font-size:12px;font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:999px}
+.pill.good{background:var(--ok);color:#fff}
+.hero{display:flex;flex-direction:column;gap:10px;padding:28px 4px 8px}
+.hero h1{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.lead{margin:0;color:var(--mute)}
+.bar{display:flex;align-items:center;gap:8px;min-height:44px}
+.bar h1{font-size:20px}
+.back{appearance:none;border:0;background:none;color:var(--p600);font:inherit;font-weight:700;min-height:44px;padding:0 8px 0 0;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats.s4{grid-template-columns:repeat(2,1fr)}
+.st{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.st small{color:var(--mute);font-size:12px}
+.st b{font-size:17px;font-variant-numeric:tabular-nums}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--p50);border-radius:14px;padding:4px;gap:4px}
+.seg.two{grid-template-columns:1fr 1fr}
+.seg button{appearance:none;border:0;background:transparent;border-radius:11px;min-height:44px;padding:0 2px;font:inherit;font-size:14px;font-weight:700;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--sf);color:var(--p600);box-shadow:0 1px 6px rgba(229,88,138,.18)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--sf);font:inherit;color:var(--ink);cursor:pointer}
+.chip.on{background:var(--p500);border-color:var(--p500);color:#fff}
+.opt{display:flex;gap:12px;align-items:center;min-height:44px;cursor:pointer}
+.opt input{width:20px;height:20px;accent-color:var(--p500);flex:none}
+.waitbox{min-height:78vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+#waitCount{font-size:clamp(46px,17vw,88px);font-weight:800;font-variant-numeric:tabular-nums;color:var(--p600);letter-spacing:-.02em}
+#waitCount.pulse{font-size:28px;animation:pl 1.2s ease-in-out infinite}
+@keyframes pl{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){#waitCount.pulse{animation:none}.btn{transition:none}}
+.view[data-view=run]{padding-top:46px}
+.runtop{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:max(8px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));pointer-events:none}
+.runtop>*{pointer-events:auto}
+.live{background:var(--sf);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--p600)}
+.af{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(92px,calc(env(safe-area-inset-bottom) + 84px));z-index:20;box-shadow:var(--shadow)}
+.fwrap{display:flex;flex-direction:column;gap:12px}
+.fhdr h2{font-size:24px}
+.fdesc{margin:8px 0 0;white-space:pre-line;color:var(--mute)}
+.freq{margin:10px 0 0;color:var(--bad);font-size:13px}
+.q{display:flex;flex-direction:column;gap:8px}
+.qt{font-weight:700}
+.star{color:var(--bad)}
+.fi{width:100%;min-height:44px;border:0;border-bottom:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:16px;padding:8px 0;border-radius:0;outline:0}
+.fi:focus{border-bottom-color:var(--p500)}
+textarea.fi{resize:vertical}
+.opts{display:flex;flex-direction:column}
+.err{color:var(--bad);font-size:13px}
+.err:empty{display:none}
+.gf .fhdr{background:var(--sf);border:1px solid var(--line);border-top:10px solid var(--p500);border-radius:10px;padding:20px}
+.gf .q{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
+.gf .q.bad{border-color:var(--bad)}
+.nf{gap:0;background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.nf .fhdr{padding:22px 20px;background:var(--p50)}
+.nf .q{padding:18px 20px;border-top:1px solid var(--line)}
+.nf .q.bad{background:color-mix(in srgb,var(--bad) 8%,var(--sf))}
+.nf .fi{border:1.5px solid var(--line);border-radius:10px;padding:8px 12px}
+.nf .submit{width:100%}
+.sbar{padding:6px 0}
+.nf .sbar{padding:16px 20px;border-top:1px solid var(--line)}
+.sbar.stick{position:sticky;bottom:0;padding-block:12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 35%);z-index:5}
+.nf .sbar.stick{background:var(--sf)}
+.big-t{display:flex;flex-direction:column;align-items:center;gap:2px;padding:22px 12px;background:var(--p50);border-radius:var(--r);text-align:center}
+.big-t small{color:var(--mute);font-weight:700}
+.big-t strong{font-size:clamp(38px,13vw,56px);font-weight:800;color:var(--p600);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.big-t span{color:var(--mute);font-variant-numeric:tabular-nums}
+.rows{display:flex;flex-direction:column}
+.rows div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.rows div:last-child{border-bottom:0}
+.rows span{color:var(--mute)}
+.rows b{font-variant-numeric:tabular-nums;text-align:right}
+.rec{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+.rec summary{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;min-height:56px;cursor:pointer;list-style:none}
+.rec summary::-webkit-details-marker{display:none}
+.rk{width:30px;height:30px;border-radius:50%;background:var(--p50);display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--mute)}
+.rk.top{background:var(--p500);color:#fff}
+.rm{display:flex;flex-direction:column;min-width:0}
+.rm b{font-variant-numeric:tabular-nums}
+.rm small,.rms{color:var(--mute);font-size:12px}
+.rms{font-variant-numeric:tabular-nums}
+.rec .rows{padding-bottom:8px}
+.rec .btn{margin:4px 0 12px;min-height:40px;width:100%}
+.fcard{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.fhead{display:flex;gap:8px;align-items:center}
+.fhead .in{flex:1;min-width:0}
+.fidx{width:26px;height:26px;border-radius:50%;background:var(--p100);color:var(--p600);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.fbtns{display:flex;gap:4px;flex:none}
+.ib{appearance:none;border:1.5px solid var(--line);background:var(--sf);color:var(--ink);border-radius:10px;min-width:40px;min-height:40px;font:inherit;font-size:13px;cursor:pointer}
+.ib:disabled{opacity:.35}
+.ib.del{color:var(--bad)}
+.frow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.frow .in{flex:1;min-width:140px}
+.dtarget{font-size:clamp(26px,9vw,40px);font-weight:800;text-align:center;font-variant-numeric:tabular-nums;color:var(--p600);padding:18px 8px;background:var(--p50);border-radius:var(--r);letter-spacing:.02em}
+.in.wrong{border-color:var(--bad)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i.d{background:var(--p500)}
+.dots i.c{outline:2px solid var(--p300);background:var(--p100)}
+.sc{width:100%;border-collapse:collapse;font-size:14px}
+.sc td{padding:8px 4px;border-bottom:1px solid var(--line)}
+.sc td:first-child{white-space:nowrap}
+.sc kbd{background:var(--p50);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font:inherit;font-weight:700;color:var(--p600)}
+.ov{position:fixed;inset:0;z-index:50;background:rgba(40,20,30,.45);display:flex;justify-content:center;align-items:flex-end}
+.ovc{background:var(--bg);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:14px max(16px,env(safe-area-inset-left)) max(24px,env(safe-area-inset-bottom))}
+.ovh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:800}
+#toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.2s;z-index:80;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (min-width:640px){body{background:linear-gradient(180deg,var(--p50),var(--bg) 320px)}.app{padding-top:32px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section class="view" data-view="home">
+  <div class="hero">
+    <span class="pill">비공식 팬덤 연습 도구</span>
+    <h1>폼림 연습실</h1>
+    <p class="lead">공방 신청, 팬미팅 응모 폼이 열리는 순간부터 제출까지. 밀리초 단위로 기록하며 연습하세요.</p>
+  </div>
+  <div class="stats" id="homeStats"></div>
+  <div class="stack">
+    <button class="btn primary big" data-go="start">연습 시작하기</button>
+    <div class="row2">
+      <button class="btn" data-go="records">기록 확인하기</button>
+      <button class="btn" data-go="settings">연습 설정</button>
+    </div>
+    <div class="row2">
+      <button class="btn ghost" data-go="builder">폼 만들기</button>
+      <button class="btn ghost" data-go="drill">항목별 연습</button>
+    </div>
+  </div>
+  <p class="note">단축키: S 시작 · G 기록 · T 설정 · B 폼 만들기 · D 항목별 연습</p>
+</section>
+
+<section class="view" data-view="start" hidden>
+  <header class="bar"><button class="back" data-go="home">‹ 홈</button><h1>연습 시작</h1></header>
+  <div class="seg" id="modeSeg">
+    <button data-mode="basic">기본 폼림</button>
+    <button data-mode="real">실전 폼림</button>
+    <button data-mode="random">랜덤 폼림</button>
+    <button data-mode="exact">정각 폼림</button>
+  </div>
+  <p class="note" id="modeDesc"></p>
+  <div class="card stack">
+    <div class="mpanel stack" data-mp="basic">
+      <div>
+        <label class="lab" for="delay">오픈까지 대기 시간 (초)</label>
+        <input class="in" id="delay" type="number" inputmode="decimal" min="0" step="0.1" data-s="delay">
+      </div>
+      <div class="chips" id="delayChips">
+        <button class="chip" data-delay="3">3초</button><button class="chip" data-delay="5">5초</button><button class="chip" data-delay="10">10초</button><button class="chip" data-delay="30">30초</button>
+      </div>
+      <label class="opt"><input type="checkbox" data-s="showCd"><span>카운트다운 표시</span></label>
+    </div>
+    <div class="mpanel stack" data-mp="real" hidden>
+      <div>
+        <label class="lab" for="realTime">신청 시작 시각 (시:분:초)</label>
+        <input class="in" id="realTime" type="time" step="1" data-s="realTime">
+      </div>
+      <div class="chips">
+        <button class="chip" data-plus="15">15초 뒤</button><button class="chip" data-plus="30">30초 뒤</button><button class="chip" data-plus="60">1분 뒤</button><button class="chip" data-plus="180">3분 뒤</button>
+      </div>
+      <div>
+        <label class="lab" for="fieldCount">사용할 신청 항목 수 (비우면 전체)</label>
+        <input class="in" id="fieldCount" type="number" min="1" inputmode="numeric" placeholder="전체" data-s="fieldCount">
+      </div>
+    </div>
+    <div class="mpanel stack" data-mp="random" hidden>
+      <div>
+        <label class="lab" for="randMethod">랜덤 방식</label>
+        <select class="in" id="randMethod" data-s="randMethod"><option value="pool">후보 시간 중에서 랜덤</option><option value="range">범위 안에서 랜덤</option></select>
+      </div>
+      <div id="poolBox"><div class="lab">대기 후보 (초) — 여러 개 선택</div><div class="chips" id="poolChips"></div></div>
+      <div id="rangeBox" class="row2">
+        <div><label class="lab" for="randMin">최소 (초)</label><input class="in" id="randMin" type="number" inputmode="decimal" min="0" step="0.1" data-s="randMin"></div>
+        <div><label class="lab" for="randMax">최대 (초)</label><input class="in" id="randMax" type="number" inputmode="decimal" min="0" step="0.1" data-s="randMax"></div>
+      </div>
+    </div>
+    <div class="mpanel stack" data-mp="exact" hidden>
+      <div><label class="lab" for="exactTime">정각 제출 시각 (시:분:초)</label><input class="in" id="exactTime" type="time" step="1" data-s="exactTime"></div>
+      <div class="chips"><button class="chip" data-plus="30" data-t="exactTime">30초 뒤</button><button class="chip" data-plus="60" data-t="exactTime">1분 뒤</button><button class="chip" data-plus="180" data-t="exactTime">3분 뒤</button><button class="chip" data-plus="600" data-t="exactTime">10분 뒤</button></div>
+      <label class="lab" for="evt">이벤트</label><select class="in" id="evt" data-s="evt"><option value="n">일반</option><option value="sp">막방·미팬 (인원 폭주)</option></select>
+      <div class="row2"><div><label class="lab" for="pickMin">선발 인원 최소</label><input class="in" id="pickMin" type="number" min="1" step="10" data-s="pickMin"></div><div><label class="lab" for="pickMax">선발 인원 최대</label><input class="in" id="pickMax" type="number" min="1" step="10" data-s="pickMax"></div></div>
+      <p class="note">매 판 선발 인원이 이 범위에서 랜덤으로 정해지고, 신청자는 선발이 많을수록 늘어나요 (일반 약 4배, 막방·미팬 약 10배). 인원은 10명 단위, 예비는 10명.</p>
+      <div class="row2"><div><label class="lab" for="macro">매크로 클릭 (정각 대비 ms)</label><input class="in" id="macro" type="number" step="10" placeholder="비움=수동" data-s="macro"></div><div><label class="lab" for="clk">서버 시계 오차 (ms)</label><input class="in" id="clk" type="number" step="10" data-s="clk"></div></div>
+      <p class="note">매크로 값을 넣으면 내 PC 시계 기준 정각+값(ms)에 자동으로 제출해요. 오차는 서버 시계가 내 PC보다 빠르면 +.</p>
+      <button class="btn ghost" id="simBtn">최적 ms 찾기 (시뮬레이션)</button><div class="rows" id="simOut"></div>
+    </div>
+    <div>
+      <label class="lab" for="formSel">사용할 폼</label>
+      <select class="in" id="formSel" data-s="lastForm"></select>
+      <div class="row2 mt"><button class="btn ghost" id="prevBtn">폼 미리보기</button><button class="btn ghost" data-go="builder">폼 편집</button></div>
+    </div>
+  </div>
+  <button class="btn primary big" id="beginBtn">시작 (Enter)</button>
+</section>
+
+<section class="view" data-view="wait" hidden>
+  <div class="waitbox">
+    <span class="pill" id="waitMode"></span>
+    <h2 id="waitTitle"></h2>
+    <div id="waitCount"></div>
+    <p class="note" id="waitSub"></p>
+    <button class="btn ghost" id="cancelWait">취소 (Esc)</button>
+  </div>
+</section>
+
+<section class="view" data-view="run" hidden>
+  <div class="runtop"><button class="chip" id="stopRun">중단</button><span class="live" id="liveT">0.000</span></div>
+  <div id="runHost"></div>
+  <button class="btn primary af" id="afBtn">자동 입력</button>
+</section>
+
+<section class="view" data-view="result" hidden>
+  <header class="bar"><h1>제출 완료</h1></header>
+  <div id="resultBox" class="stack"></div>
+  <div class="stack">
+    <button class="btn primary big" id="againBtn">한 번 더 (R)</button>
+    <div class="row2"><button class="btn" data-go="records">기록 보기 (G)</button><button class="btn ghost" data-go="home">홈으로 (H)</button></div>
+    <button class="btn ghost" id="saveOne">이 결과 저장 (JSON)</button>
+  </div>
+</section>
+
+<section class="view" data-view="records" hidden>
+  <header class="bar"><button class="back" data-go="home">‹ 홈</button><h1>기록 확인</h1></header>
+  <div class="stats s4" id="recSummary"></div>
+  <div class="chips" id="recFilter"></div>
+  <div class="seg two" id="recSort"><button data-sort="recent">최근순</button><button data-sort="rank">순위순</button></div>
+  <div class="stack" id="recList"></div>
+  <div class="card stack">
+    <div class="lab">항목별 연습 기록</div>
+    <div id="drillBest" class="rows"></div>
+  </div>
+  <div class="row2"><button class="btn" id="expCsv">CSV 저장</button><button class="btn" id="expJson">백업 저장 (JSON)</button></div>
+  <button class="btn danger" id="resetRec">기록 초기화</button>
+</section>
+
+<section class="view" data-view="builder" hidden>
+  <header class="bar"><button class="back" data-go="home">‹ 홈</button><h1>폼 만들기</h1></header>
+  <div class="card stack">
+    <div>
+      <label class="lab" for="bForm">편집할 폼</label>
+      <select class="in" id="bForm"></select>
+    </div>
+    <div class="row2"><button class="btn ghost" id="bNew">새 폼</button><button class="btn ghost" id="bDup">복제</button></div>
+    <button class="btn danger" id="bDel">이 폼 삭제</button>
+  </div>
+  <div class="card stack">
+    <div><label class="lab" for="bTitle">폼 제목</label><input class="in" id="bTitle" maxlength="60"></div>
+    <div><label class="lab" for="bDesc">안내 문구</label><textarea class="in" id="bDesc" rows="3" maxlength="300"></textarea></div>
+  </div>
+  <div class="stack" id="bFields"></div>
+  <div class="card stack">
+    <div class="lab">항목 추가</div>
+    <select class="in" id="bType" aria-label="추가할 항목 유형"></select>
+    <button class="btn" id="bAdd">항목 추가</button>
+  </div>
+  <div class="row2"><button class="btn ghost" id="bPrev">폼 미리보기</button><button class="btn primary" id="bUse">이 폼으로 연습</button></div>
+  <p class="note">변경 내용은 자동으로 저장됩니다.</p>
+</section>
+
+<section class="view" data-view="drill" hidden>
+  <header class="bar"><button class="back" data-go="home">‹ 홈</button><h1>항목별 연습</h1></header>
+  <div class="card stack" id="drillCfg">
+    <div class="lab">연습할 항목</div>
+    <div class="chips" id="drillTypes"></div>
+    <div class="row2">
+      <div><label class="lab" for="drillRounds">반복 횟수</label><select class="in" id="drillRounds"><option>3</option><option selected>5</option><option>10</option></select></div>
+      <div style="display:flex;align-items:flex-end"><label class="opt"><input type="checkbox" id="drillRand"><span>무작위 값</span></label></div>
+    </div>
+    <p class="note">내 정보 값은 연습 설정에서 바꿀 수 있어요. 목표 값과 똑같이 입력하면 자동으로 다음 문제로 넘어갑니다.</p>
+    <button class="btn primary" id="drillStart">연습 시작</button>
+  </div>
+  <div class="stack" id="drillPlay" hidden>
+    <div class="dots" id="drillDots"></div>
+    <div class="dtarget" id="drillTarget"></div>
+    <input class="in" id="drillInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="목표 값 입력">
+    <button class="btn ghost" id="drillStop">중단</button>
+  </div>
+  <div class="card stack" id="drillRes" hidden></div>
+</section>
+
+<section class="view" data-view="settings" hidden>
+  <header class="bar"><button class="back" data-go="home">‹ 홈</button><h1>연습 설정</h1></header>
+  <div class="card stack">
+    <div class="lab">폼 화면</div>
+    <div><label class="lab" for="sStyle">폼 디자인</label><select class="in" id="sStyle" data-s="formStyle"><option value="google">구글폼 스타일</option><option value="naver">네이버폼 스타일</option></select></div>
+    <div><label class="lab" for="sPos">제출 버튼 위치</label><select class="in" id="sPos" data-s="submitPos"><option value="bottom">맨 아래</option><option value="top">맨 위</option><option value="sticky">하단 고정</option><option value="random">매번 랜덤</option></select></div>
+    <label class="opt"><input type="checkbox" data-s="autofillBtn"><span>자동 입력 버튼 표시 (Alt+A)</span></label>
+    <label class="opt"><input type="checkbox" data-s="liveTimer"><span>경과 시간 표시 (기록에는 영향 없음)</span></label>
+    <label class="opt"><input type="checkbox" data-s="beep"><span>폼이 열릴 때 알림음</span></label>
+  </div>
+  <div class="card stack">
+    <div class="lab">내 정보 (자동 입력, 항목별 연습에 사용)</div>
+    <div><label class="lab" for="pName">이름</label><input class="in" id="pName" data-s="profile.name" autocomplete="off"></div>
+    <div><label class="lab" for="pNick">닉네임</label><input class="in" id="pNick" data-s="profile.nick" autocomplete="off"></div>
+    <div><label class="lab" for="pBirth">생년월일</label><input class="in" id="pBirth" data-s="profile.birth" inputmode="numeric" autocomplete="off"></div>
+    <div><label class="lab" for="pPhone">전화번호</label><input class="in" id="pPhone" data-s="profile.phone" inputmode="tel" autocomplete="off"></div>
+    <div><label class="lab" for="pMail">이메일</label><input class="in" id="pMail" data-s="profile.email" inputmode="email" autocomplete="off"></div>
+    <div><label class="lab" for="pMem">멤버십 번호</label><input class="in" id="pMem" data-s="profile.member" autocomplete="off"></div>
+  </div>
+  <div class="card stack">
+    <div class="lab">데이터</div>
+    <button class="btn" id="sExport">백업 저장 (JSON)</button>
+    <label class="btn" style="display:grid;place-items:center;cursor:pointer" for="sImport">백업 불러오기</label>
+    <input id="sImport" type="file" accept="application/json,.json" hidden>
+    <button class="btn danger" id="sReset">설정·폼·기록 전체 초기화</button>
+  </div>
+  <div class="card">
+    <div class="lab">키보드 단축키</div>
+    <table class="sc"><tbody>
+      <tr><td><kbd>S</kbd> <kbd>G</kbd> <kbd>T</kbd> <kbd>B</kbd> <kbd>D</kbd></td><td>홈에서 시작 · 기록 · 설정 · 폼 만들기 · 항목별 연습</td></tr>
+      <tr><td><kbd>1</kbd>–<kbd>4</kbd></td><td>시작 화면에서 기본 · 실전 · 랜덤 · 정각 모드 선택</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>시작 화면에서 연습 시작</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>폼에서 제출 (Mac은 ⌘)</td></tr>
+      <tr><td><kbd>Alt</kbd>+<kbd>A</kbd></td><td>폼에서 자동 입력</td></tr>
+      <tr><td><kbd>R</kbd> <kbd>H</kbd></td><td>결과 화면에서 다시 하기 · 홈</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>뒤로 가기 · 대기 취소</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+</div>
+
+<div class="ov" id="ov" hidden>
+  <div class="ovc" role="dialog" aria-label="폼 미리보기">
+    <div class="ovh"><span>폼 미리보기</span><button class="btn ghost" id="ovClose" style="min-height:40px">닫기</button></div>
+    <div id="ovBody"></div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const KEY='formrim.v1';
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+const pad=(n,l=2)=>String(n).padStart(l,'0');
+const fmtS=ms=>(ms/1000).toFixed(3)+'초';
+const fmtMs=ms=>Math.round(ms).toLocaleString('ko-KR')+' ms';
+const fmtClock=t=>{const d=new Date(t);return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(),3)}`};
+const fmtDate=t=>{const d=new Date(t);return `${d.getMonth()+1}.${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const fmtCd=ms=>{const t=Math.max(0,ms),hh=Math.floor(t/3600000),m=Math.floor(t%3600000/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10);return hh?`${hh}:${pad(m)}:${pad(s)}`:`${pad(m)}:${pad(s)}.${pad(c)}`};
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const gp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+const sp=(o,p,v)=>{const ks=p.split('.'),l=ks.pop();ks.reduce((a,k)=>a[k]=a[k]||{},o)[l]=v};
+const evTs=e=>(e&&e.timeStamp&&e.timeStamp<1e12)?e.timeStamp:performance.now();
+
+function h(tag,props,...kids){
+  const e=document.createElement(tag);
+  if(props)for(const k in props){const v=props[k];
+    if(k==='class')e.className=v;
+    else if(k==='text')e.textContent=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else if(v===true)e.setAttribute(k,'');
+    else if(v!==false&&v!=null)e.setAttribute(k,v)}
+  for(const c of kids.flat())if(c!=null&&c!==false)e.append(c.nodeType?c:document.createTextNode(c));
+  return e;
+}
+
+const MODES={basic:'기본 폼림',real:'실전 폼림',random:'랜덤 폼림',exact:'정각 폼림'};
+const MODE_DESC={
+  basic:'지정한 시간이 지나면 폼이 열려요. 오픈 순간부터 제출까지 걸린 시간을 측정합니다.',
+  real:'정해진 시각에 폼이 열려요. 항목 수와 폼 구성을 실제 신청처럼 맞춰 연습하세요.',
+  random:'언제 열릴지 알 수 없어요. 후보 시간이나 범위에서 무작위로 정해지고 카운트다운은 숨겨집니다.',
+  exact:'시작하면 폼이 바로 떠요. 정각까지 초를 세다가 제출 버튼만 누르세요. 서버 접수가 정각보다 빠르면 무효이고, 접속 폭주 지연도 반영돼요.'
+};
+const TYPES={text:'짧은 텍스트',textarea:'긴 텍스트 (주관식)',number:'숫자',birth:'생년월일',phone:'전화번호',email:'이메일',member:'멤버십 번호',radio:'객관식 (하나 선택)',checkbox:'체크박스 (여러 개 선택)'};
+const FILLS={'':'자동 입력 안 함',name:'이름',nick:'닉네임',birth:'생년월일',phone:'전화번호',email:'이메일',member:'멤버십 번호'};
+const DF={birth:'birth',phone:'phone',email:'email',member:'member'};
+const DEFLABEL={text:'이름',textarea:'하고 싶은 말',number:'숫자 입력',birth:'생년월일',phone:'전화번호',email:'이메일',member:'멤버십 번호',radio:'참석 회차',checkbox:'동의 항목'};
+const PH={text:'내 답변',textarea:'내 답변',number:'숫자만 입력',birth:'생년월일 6자리 (예: 990101)',phone:'010-0000-0000',email:'example@email.com',member:'멤버십 번호'};
+const AC={name:'name',nick:'nickname',birth:'bday',phone:'tel',email:'email'};
+
+const F=(type,label,required=true,x={})=>Object.assign({id:uid(),type,label,required},x);
+const defSettings=()=>({delay:'5',showCd:true,realTime:'',fieldCount:'',randMethod:'pool',pool:[3,5,10],randMin:'3',randMax:'10',lastMode:'basic',exactTime:'',preOpen:'10',pickMin:'50',pickMax:'100',evt:'n',macro:'',clk:'0',lastForm:'f1',formStyle:'google',submitPos:'bottom',autofillBtn:true,liveTimer:true,beep:false,profile:{name:'홍길동',nick:'별빛',birth:'990101',phone:'010-1234-5678',email:'fan@example.com',member:'FAN-123456'}});
+const defForms=()=>[
+  {id:'f1',title:'간단 폼림 연습',desc:'가장 기본적인 신청 폼입니다.',fields:[F('text','이름',true,{fill:'name'}),F('phone','전화번호'),F('radio','참석 여부',true,{options:['참석','불참']})]},
+  {id:'f2',title:'팬미팅 응모 (실전형)',desc:'※ 선착순으로 마감됩니다.\n모든 정보는 멤버십 가입 정보와 동일하게 입력해 주세요.',fields:[F('text','이름',true,{fill:'name'}),F('birth','생년월일'),F('phone','전화번호'),F('email','이메일'),F('member','멤버십 번호'),F('radio','희망 회차',true,{options:['1회차 (14:00)','2회차 (18:00)']}),F('checkbox','안내 사항 동의',true,{options:['개인정보 수집 및 이용에 동의합니다','양도·재판매 금지 안내를 확인했습니다']}),F('textarea','하고 싶은 말',false)]},
+  {id:'f3',title:'공방 신청',desc:'공개방송 참여 신청 폼입니다. 닉네임으로 본인 확인을 합니다.',fields:[F('text','닉네임',true,{fill:'nick'}),F('text','이름',true,{fill:'name'}),F('phone','연락처'),F('number','동행 인원 (본인 제외)'),F('radio','입장 시간대',true,{options:['오전','오후','저녁']})]}
+];
+const fresh=()=>({v:1,settings:defSettings(),forms:defForms(),records:[],drills:[]});
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(d&&typeof d==='object'){
+      const b=fresh(),st=Object.assign(b.settings,d.settings||{});
+      st.profile=Object.assign(defSettings().profile,(d.settings||{}).profile||{});
+      return{v:1,settings:st,forms:Array.isArray(d.forms)&&d.forms.length?d.forms:b.forms,records:Array.isArray(d.records)?d.records:[],drills:Array.isArray(d.drills)?d.drills:[]};
+    }
+  }catch(e){}
+  return fresh();
+}
+let db=load(),warned=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){if(!warned){warned=true;toast('브라우저 저장소를 쓸 수 없어 기록이 새로고침 후 사라질 수 있어요')}}}
+
+const ui={view:'home',mode:db.settings.lastMode||'basic',bForm:null,run:null,last:null,rec:{filter:'all',sort:'recent'},drill:{type:'phone'},ac:null};
+let toastT=0;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2400)}
+function getForm(){return db.forms.find(f=>f.id===db.settings.lastForm)||db.forms[0]}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function armConfirm(btn,fn){
+  if(btn.dataset.arm){clearTimeout(+btn.dataset.arm);delete btn.dataset.arm;btn.textContent=btn.dataset.l;fn();return}
+  btn.dataset.l=btn.textContent;btn.textContent='한 번 더 누르면 실행돼요';
+  btn.dataset.arm=setTimeout(()=>{delete btn.dataset.arm;btn.textContent=btn.dataset.l},3500);
+}
+function dl(name,text,type){const b=new Blob([text],{type});const a=h('a',{href:URL.createObjectURL(b),download:name});document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600)}
+
+/* ---------- 폼 렌더링 / 검증 / 자동입력 ---------- */
+function fieldEl(f,i,naver){
+  const id='q_'+f.id,q=h('section',{class:'q','data-fid':f.id});
+  const title=[naver?`${i+1}. `:'',f.label,f.required?h('span',{class:'star',text:' *'}):null];
+  let body;
+  if(f.type==='radio'||f.type==='checkbox'){
+    q.append(h('div',{class:'qt'},title));
+    body=h('div',{class:'opts'},(f.options||[]).map(o=>h('label',{class:'opt'},h('input',{type:f.type,name:'n_'+f.id,value:o}),h('span',{text:o}))));
+  }else{
+    q.append(h('label',{class:'qt',for:id},title));
+    if(f.type==='textarea')body=h('textarea',{class:'fi',id,rows:3,placeholder:PH.textarea});
+    else{
+      const fk=f.fill||DF[f.type]||'';
+      body=h('input',{class:'fi',id,type:f.type==='email'?'email':f.type==='phone'?'tel':'text',inputmode:{number:'numeric',birth:'numeric',phone:'tel',email:'email'}[f.type],maxlength:f.type==='birth'?8:null,placeholder:PH[f.type],autocomplete:AC[fk]||'off',autocapitalize:'off',autocorrect:'off',spellcheck:'false'});
+    }
+  }
+  q.append(body,h('div',{class:'err'}));
+  return q;
+}
+function renderForm(form,o={}){
+  const naver=db.settings.formStyle==='naver';
+  const root=h('div',{class:'fwrap '+(naver?'nf':'gf')});
+  const mk=()=>h('button',{class:'btn primary submit',type:'button',onclick:e=>o.onSubmit&&o.onSubmit(e)},naver?'제출하기':'제출');
+  root.append(h('div',{class:'fhdr'},h('h2',{text:form.title||'(제목 없음)'}),form.desc?h('p',{class:'fdesc',text:form.desc}):null,h('p',{class:'freq',text:'* 표시는 필수 항목입니다'})));
+  if(o.pos==='top')root.append(h('div',{class:'sbar'},mk()));
+  form.fields.forEach((f,i)=>root.append(fieldEl(f,i,naver)));
+  if(o.pos!=='top')root.append(h('div',{class:'sbar'+(o.pos==='sticky'?' stick':'')},mk()));
+  root.addEventListener('input',e=>{const q=e.target.closest('.q');if(q){q.classList.remove('bad');$('.err',q).textContent=''}});
+  return root;
+}
+function getVal(root,f){
+  const q=$(`[data-fid="${f.id}"]`,root);
+  if(f.type==='radio'){const c=$('input:checked',q);return c?c.value:''}
+  if(f.type==='checkbox')return $$('input:checked',q).map(i=>i.value);
+  return $('input,textarea',q).value.trim();
+}
+function check(f,v){
+  const empty=Array.isArray(v)?!v.length:v==='';
+  if(empty)return f.required?'필수 항목입니다':'';
+  if(f.type==='birth'&&!/^(\d{6}|\d{8})$/.test(v))return '생년월일을 숫자 6자리 또는 8자리로 입력해 주세요';
+  if(f.type==='phone'&&!/^01[016789]-?\d{3,4}-?\d{4}$/.test(v))return '올바른 전화번호를 입력해 주세요';
+  if(f.type==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))return '올바른 이메일 주소를 입력해 주세요';
+  if(f.type==='number'&&!/^\d+$/.test(v))return '숫자만 입력해 주세요';
+  return '';
+}
+function validate(root,form){
+  let first=null;
+  for(const f of form.fields){
+    const m=check(f,getVal(root,f)),q=$(`[data-fid="${f.id}"]`,root);
+    q.classList.toggle('bad',!!m);$('.err',q).textContent=m;
+    if(m&&!first)first=q;
+  }
+  if(first)first.scrollIntoView({block:'center',behavior:'smooth'});
+  return !first;
+}
+function autofill(root,form){
+  const p=db.settings.profile;let n=0;
+  form.fields.forEach(f=>{
+    const q=$(`[data-fid="${f.id}"]`,root);if(!q)return;
+    const key=f.fill||DF[f.type];
+    if(f.type==='radio'){const i=$('input',q);if(i){i.checked=true;n++}}
+    else if(f.type==='checkbox'){$$('input',q).forEach(i=>i.checked=true);n++}
+    else if(f.type==='textarea'){$('textarea',q).value='항상 응원합니다!';n++}
+    else if(f.type==='number'){$('input',q).value='1';n++}
+    else{const v=p[key]||'';if(v){$('input',q).value=v;n++}}
+    q.classList.remove('bad');$('.err',q).textContent='';
+  });
+  return n;
+}
+
+/* ---------- 화면 전환 ---------- */
+function show(v){
+  ui.view=v;
+  $$('.view').forEach(e=>e.hidden=e.dataset.view!==v);
+  const r={home:rHome,start:rStart,records:rRecords,builder:rBuilder,drill:rDrill,settings:rSettings,result:rResult}[v];
+  if(r)r();
+  window.scrollTo(0,0);
+}
+
+/* ---------- 연습 실행 엔진 (performance.now 기반) ---------- */
+function initAudio(){
+  if(!db.settings.beep)return;
+  try{ui.ac=ui.ac||new (window.AudioContext||window.webkitAudioContext)();if(ui.ac.state==='suspended')ui.ac.resume()}catch(e){}
+}
+function beep(){
+  try{const A=ui.ac;if(!A)return;const o=A.createOscillator(),g=A.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g);g.connect(A.destination);o.start();o.stop(A.currentTime+.12)}catch(e){}
+}
+function cancelRun(){
+  const r=ui.run;if(!r)return;
+  clearTimeout(r.to);clearTimeout(r.mc);cancelAnimationFrame(r.raf);cancelAnimationFrame(r.lraf);
+  r.state='cancel';ui.run=null;
+}
+function startRun(mode,form,delay,rem){
+  cancelRun();
+  const s=db.settings;
+  let pos=s.submitPos;
+  if(pos==='random')pos=['top','bottom','sticky'][Math.floor(Math.random()*3)];
+  const now=performance.now();
+  const r=ui.run={mode,form,delay,pos,state:'wait',target:now+delay*1000,tgt:rem!=null?now+rem*1000:0,openT:0,openErr:0,first:null,last:null,firstClick:null,fails:0,raf:0,lraf:0,to:0,lastTxt:'',hideCd:mode==='random'||(mode==='basic'&&!s.showCd)};
+  if(r.tgt){const a=+s.pickMin||50,b=Math.max(a,+s.pickMax||100);r.pick=r10(a+Math.random()*(b-a));curN=r.N=nApp(r.pick);form.desc=`선발 ${r.pick}명 · 예비 10명`}
+  const targetWall=Date.now()+delay*1000;
+  const host=$('#runHost');host.innerHTML='';
+  r.root=renderForm(form,{pos,onSubmit:e=>runSubmit(evTs(e))});
+  r.root.addEventListener('input',e=>runInput(evTs(e)));
+  r.root.addEventListener('change',e=>runInput(evTs(e)));
+  if(r.tgt)r.root.insertBefore(h('div',{class:'dtarget',id:'bigCd',style:'font-size:clamp(44px,15vw,72px)'}),$('.sbar',r.root));
+  host.append(r.root);
+  $('#waitMode').textContent=MODES[mode];
+  $('#waitTitle').textContent=form.title;
+  const wc=$('#waitCount');wc.classList.toggle('pulse',r.hideCd);
+  if(r.hideCd){wc.textContent='대기 중…';$('#waitSub').textContent=mode==='random'?'언제 열릴지 몰라요. 열리는 즉시 입력하세요.':'곧 열립니다. 집중하세요.'}
+  else{wc.textContent=fmtCd(delay*1000);const d=new Date(targetWall);$('#waitSub').textContent=`오픈 예정 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`}
+  show('wait');
+  r.to=setTimeout(()=>{
+    if(ui.run!==r||r.state!=='wait')return;
+    while(performance.now()<r.target){}
+    openNow();
+  },Math.max(0,delay*1000-8));
+  r.raf=requestAnimationFrame(tick);
+}
+function tick(){
+  const r=ui.run;if(!r||r.state!=='wait')return;
+  const rem=r.target-performance.now();
+  if(rem<=0){openNow();return}
+  if(!r.hideCd){const t=fmtCd(rem);if(t!==r.lastTxt){r.lastTxt=t;$('#waitCount').textContent=t}}
+  r.raf=requestAnimationFrame(tick);
+}
+function openNow(){
+  const r=ui.run;if(!r||r.state!=='wait')return;
+  r.state='open';
+  cancelAnimationFrame(r.raf);clearTimeout(r.to);
+  $$('.view').forEach(e=>e.hidden=e.dataset.view!=='run');
+  r.openT=performance.now();             // 폼이 화면에 나타난 순간 = 측정 기준점
+  r.openErr=r.openT-r.target;
+  ui.view='run';
+  window.scrollTo(0,0);
+  const s=db.settings;
+  $('#afBtn').hidden=!s.autofillBtn||!!r.tgt;
+  const lv=s.liveTimer||r.tgt;$('#liveT').hidden=!lv;
+  if(lv)r.lraf=requestAnimationFrame(live);   // 화면 표시용. 측정값과 분리
+  if(s.beep)setTimeout(beep,0);
+  const mo=parseFloat(s.macro);
+  if(r.tgt&&s.macro!==''&&!isNaN(mo)){
+    
+    const at=r.tgt+mo;
+    r.mc=setTimeout(()=>{if(ui.run!==r||r.state!=='open')return;while(performance.now()<at){}runSubmit(performance.now())},Math.max(0,at-performance.now()-8));
+  }
+}
+function live(){
+  const r=ui.run;if(!r||r.state!=='open')return;
+  const n=performance.now(),t=r.tgt-n;if(r.tgt){const x=t>0?fmtCd(t):'+'+(-t/1000).toFixed(3),e=$('#bigCd');$('#liveT').textContent='정각 '+(t>0?'−':'')+x;if(e)e.textContent=x}else $('#liveT').textContent=((n-r.openT)/1000).toFixed(3);
+  r.lraf=requestAnimationFrame(live);
+}
+function runInput(ts){
+  const r=ui.run;if(!r||r.state!=='open')return;
+  if(r.first==null)r.first=ts;
+  r.last=ts;
+}
+function runSubmit(ts){
+  const r=ui.run;if(!r||r.state!=='open')return;
+  if(r.firstClick==null)r.firstClick=ts;
+  if(!validate(r.root,r.form)){r.fails++;toast('입력 내용을 확인해 주세요');return}
+  finish(ts);
+}
+function doAutofill(){
+  const r=ui.run;if(!r||r.state!=='open')return;
+  const n=autofill(r.root,r.form);
+  runInput(performance.now());
+  toast(n?'자동 입력했어요':'자동 입력할 값이 없어요');
+}
+function finish(ts){
+  const r=ui.run;r.state='done';
+  cancelAnimationFrame(r.lraf);
+  const o=performance.timeOrigin;
+  const rec={id:uid(),ts:Date.now(),mode:r.mode,form:r.form.title,fields:r.form.fields.length,pos:r.pos,delay:r.delay,
+    openAt:o+r.openT,submitAt:o+ts,total:ts-r.openT,
+    first:r.first!=null?r.first-r.openT:null,
+    typing:(r.first!=null&&r.last!=null)?Math.max(0,r.last-r.first):null,
+    click:r.firstClick-r.openT,fails:r.fails,openErr:r.openErr};
+  if(!r.tgt){db.records.push(rec);save();ui.last=rec;show('result');return}
+  // 정각 모드: 서버 접수 = 클릭 + 트래픽 지연. 정각보다 빠르면 무효
+  const ck=parseFloat(db.settings.clk)||0,lat=netLat((ts+ck-r.tgt)/1000),diff=ts+lat+ck-r.tgt;
+  let rank=0;if(diff>=0){rank=1;for(let i=1;i<r.N;i++)if(other()<diff)rank++}
+  Object.assign(rec,{tgtAt:o+r.tgt,lat,recvAt:o+ts+lat+ck,diff,bad:diff<0,total:diff<0?1e9:diff,traf:r.N,pick:r.pick,N:r.N,rank,ok:rank>0&&rank<=r.pick});
+  const b=$('.submit',r.root);b.disabled=true;b.textContent='전송 중…';
+  r.to=setTimeout(()=>{if(ui.run!==r)return;db.records.push(rec);save();ui.last=rec;show('result')},Math.min(lat,8000));
+}
+/* 트래픽 지연(ms) = 기본망 40~100 + 인원×1.1ms×정각 근접도×로그정규 변동.
+   tc=정각 대비 클릭(초). 정각 직전 서서히 증가, 정각에 최대, 이후 (4+인원/600)초 시정수로 감소 */
+function netLat(tc){
+  const N=curN||300,g=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
+  const w=tc>=0?Math.exp(-tc/(4+N/600)):.6*Math.exp(tc/15);
+  return Math.min(10000,40+Math.random()*60+N*1.1*w*Math.exp(.5*g));
+}
+let curN=0;
+const r10=x=>Math.round(x/10)*10,nApp=p=>r10(p*(db.settings.evt==='sp'?10:4)*(.97+Math.random()*.06));
+const gs=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
+const rcv=c=>c+netLat(c/1000);
+/* 다른 신청자 1명의 서버 접수 시각(정각 대비 ms): 25% 일찍 누르는 매크로형, 60% 정각 직후 반응, 15% 느린 사람. 조기 거절되면 재시도 */
+function other(){
+  const u=Math.random();let c=u<.25?-250+gs()*300:u<.85?250+gs()*250:500-Math.log(1-Math.random())*1500,r=rcv(c);
+  for(let k=0;r<0&&k<3;k++){c=r+300+Math.random()*500;r=rcv(c)}
+  return r<0?1e9:r;
+}
+function sim(off,ck,N){let b=0;const d=[];for(let i=0;i<N;i++){const x=off+netLat((off+ck)/1000)+ck;if(x<0)b++;d.push(x)}d.sort((a,c)=>a-c);return[b/N,d[N>>1]]}
+const nx=()=>db.records.filter(r=>r.mode!=='exact');
+const sg=ms=>(ms>=0?'+':'−')+(Math.abs(ms)/1000).toFixed(3)+'초';
+
+/* ---------- 통계 ---------- */
+function stats(list){
+  list=list.filter(r=>!r.bad);if(!list.length)return null;
+  const t=list.map(r=>r.total),rc=[...list].sort((a,b)=>b.ts-a.ts).slice(0,5).map(r=>r.total);
+  return{n:t.length,best:Math.min(...t),avg:mean(t),recent:mean(rc)};
+}
+function st(label,val){return h('div',{class:'st'},h('small',{text:label}),h('b',{text:val}))}
+function detailRows(r){
+  if(r.mode==='exact')return[['정각 시각',fmtClock(r.tgtAt)],['제출 클릭',`${fmtClock(r.submitAt)} (${sg(r.submitAt-r.tgtAt)})`],['트래픽 지연',`${Math.round(r.lat)} ms (동시 ${r.traf}명)`],['서버 접수',fmtClock(r.recvAt)],['정각 대비 접수',(r.bad?'조기 · ':'')+sg(r.diff)],['접수 순위',r.bad?'—':`${r.rank}위 / 신청 약 ${r.N}명`],['선발',`${r.pick}명 + 예비 10명 → ${r.bad?'무효':r.ok?'합격권':r.rank<=r.pick+10?'예비':'탈락권'}`],['제출 시도',`${r.fails+1}회`]];
+  return [
+    ['폼 오픈 시각',fmtClock(r.openAt)],
+    ['제출 시각',fmtClock(r.submitAt)],
+    ['오픈 → 제출',`${fmtS(r.total)} (${fmtMs(r.total)})`],
+    ['첫 입력까지',r.first!=null?fmtS(r.first):'—'],
+    ['전체 입력 소요',r.typing!=null?fmtS(r.typing):'—'],
+    ['제출 버튼 클릭까지',fmtS(r.click)],
+    ['제출 시도',`${r.fails+1}회 (오류 ${r.fails}회)`],
+    ['오픈 오차 (예정 대비)',`${r.openErr>=0?'+':''}${r.openErr.toFixed(2)} ms`]
+  ];
+}
+function rowsEl(rows){return h('div',{class:'rows'},rows.map(([k,v])=>h('div',{},h('span',{text:k}),h('b',{text:v}))))}
+
+/* ---------- 홈 ---------- */
+function rHome(){
+  const s=stats(nx()),b=$('#homeStats');b.innerHTML='';
+  b.append(st('개인 최고',s?fmtS(s.best):'—'),st('평균',s?fmtS(s.avg):'—'),st('연습 횟수',(s?s.n:0)+'회'));
+}
+
+/* ---------- 시작 ---------- */
+function fillBindings(root){
+  $$('[data-s]',root).forEach(el=>{const v=gp(db.settings,el.dataset.s);if(el.type==='checkbox')el.checked=!!v;else el.value=v==null?'':v});
+}
+function rStart(){
+  const s=db.settings,root=$('[data-view=start]');
+  const sel=$('#formSel');sel.innerHTML='';
+  db.forms.forEach(f=>sel.append(h('option',{value:f.id,text:`${f.title} (${f.fields.length}항목)`})));
+  if(!db.forms.find(f=>f.id===s.lastForm)){s.lastForm=db.forms[0].id;save()}
+  fillBindings(root);
+  $$('#modeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.mode===ui.mode));
+  $$('.mpanel').forEach(p=>p.hidden=p.dataset.mp!==ui.mode);
+  $('#modeDesc').textContent=MODE_DESC[ui.mode];
+  const pc=$('#poolChips');pc.innerHTML='';
+  [1,2,3,5,7,10,15,20,30].forEach(n=>pc.append(h('button',{class:'chip'+(s.pool.includes(n)?' on':''),'data-pool':n,text:n+'초'})));
+  $('#poolBox').hidden=s.randMethod!=='pool';
+  $('#rangeBox').hidden=s.randMethod!=='range';
+}
+function pickRandom(){
+  const s=db.settings;
+  if(s.randMethod==='range'){
+    let a=parseFloat(s.randMin),b=parseFloat(s.randMax);
+    if(!(a>=0))a=3;if(!(b>=a))b=a;
+    return Math.round((a+Math.random()*(b-a))*1000)/1000;
+  }
+  const p=s.pool&&s.pool.length?s.pool:[3,5,10];
+  return p[Math.floor(Math.random()*p.length)];
+}
+function realTarget(k='realTime'){
+  const t=(db.settings[k]||'').split(':').map(Number);
+  if(t.length<2||t.some(isNaN))return null;
+  const d=new Date();d.setHours(t[0],t[1],t[2]||0,0);return d;
+}
+function begin(){
+  const s=db.settings;let form=getForm();
+  if(!form||(ui.mode!=='exact'&&!form.fields.length)){toast('폼에 항목이 없어요. 폼 만들기에서 항목을 추가해 주세요');return}
+  let delay,rem=null;
+  if(ui.mode==='basic'){delay=parseFloat(s.delay);if(!(delay>=0)){toast('대기 시간을 확인해 주세요');return}}
+  else if(ui.mode==='random')delay=pickRandom();
+  else if(ui.mode==='exact'){
+    const d=realTarget('exactTime');
+    if(!d){toast('정각 제출 시각을 설정해 주세요');return}
+    rem=(d.getTime()-Date.now())/1000;
+    if(rem<3){toast('이미 지난 시각이에요. 시각을 다시 설정해 주세요');return}
+    delay=0;form=clone(form);form.fields=[];
+  }else{
+    const d=realTarget();
+    if(!d){toast('신청 시작 시각을 설정해 주세요');return}
+    delay=(d.getTime()-Date.now())/1000;
+    if(delay<1){toast('이미 지난 시각이에요. 시작 시각을 다시 설정해 주세요');return}
+    const n=parseInt(s.fieldCount,10);
+    if(n>=1&&n<form.fields.length){form=clone(form);form.fields=form.fields.slice(0,n)}
+  }
+  initAudio();
+  startRun(ui.mode,clone(form),delay,rem);
+}
+function againRun(){
+  if(ui.mode==='real'||ui.mode==='exact'){
+    const k=ui.mode==='real'?'realTime':'exactTime',n=k==='realTime'?15:60,d=new Date(Date.now()+n*1000);
+    db.settings[k]=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;save();
+    toast(`시작 시각을 ${n}초 뒤로 맞췄어요`);
+  }
+  begin();
+}
+
+/* ---------- 결과 ---------- */
+function rResult(){
+  const r=ui.last;if(!r)return;
+  const box=$('#resultBox'),L=nx();box.innerHTML='';
+  if(r.mode==='exact'){
+    box.append(h('div',{class:'big-t'},h('small',{text:'정각 폼림 · 서버 접수 기준'}),h('strong',{text:r.bad?'너무 빨라요':r.rank+'위'}),h('span',{text:r.bad?`정각보다 ${(-r.diff/1000).toFixed(3)}초 먼저 접수 → 무효`:`정각 ${sg(r.diff)} 접수 · 선발 ${r.pick}명 중 ${r.ok?'합격권':r.rank<=r.pick+10?'예비':'탈락권'}`})),h('div',{class:'card'},rowsEl(detailRows(r))));
+    const E=db.records.filter(x=>x.mode==='exact'),V=E.filter(x=>!x.bad);
+    if(V.length)box.append(h('div',{class:'row2'},st('정각 접수 최고',sg(Math.min(...V.map(x=>x.diff)))),st('최고 순위',Math.min(...V.map(x=>x.rank||1e9))+'위')));
+    return;
+  }
+  const sorted=[...L].sort((a,b)=>a.total-b.total);
+  const rank=sorted.findIndex(x=>x.id===r.id)+1;
+  const others=L.filter(x=>x.id!==r.id);
+  const prevBest=others.length?Math.min(...others.map(x=>x.total)):null;
+  const avgAll=mean(L.map(x=>x.total));
+  box.append(h('div',{class:'big-t'},h('small',{text:`${MODES[r.mode]} · 폼 오픈 → 제출`}),h('strong',{text:fmtS(r.total)}),h('span',{text:fmtMs(r.total)})));
+  const badge=[];
+  if(prevBest==null)badge.push(h('span',{class:'pill good',text:'첫 기록'}));
+  else if(r.total<prevBest)badge.push(h('span',{class:'pill good',text:'개인 최고 기록 갱신'}));
+  const cmp=[`전체 ${L.length}회 중 ${rank}위`];
+  if(prevBest!=null){const d=r.total-prevBest;cmp.push(`최고 대비 ${d>=0?'+':'−'}${(Math.abs(d)/1000).toFixed(3)}초`)}
+  if(others.length){const d=r.total-mean(others.map(x=>x.total));cmp.push(`평균 대비 ${d>=0?'+':'−'}${(Math.abs(d)/1000).toFixed(3)}초`)}
+  box.append(h('div',{class:'stack'},badge,h('p',{class:'note',text:cmp.join(' · ')})));
+  box.append(h('div',{class:'card'},rowsEl(detailRows(r))));
+  box.append(h('div',{class:'row2'},st('개인 최고',fmtS(Math.min(...L.map(x=>x.total)))),st('평균',fmtS(avgAll))));
+}
+
+/* ---------- 기록 ---------- */
+function rRecords(){
+  const f=ui.rec.filter,all=db.records;
+  const list=f==='all'?nx():all.filter(r=>r.mode===f);
+  const s=stats(list),sum=$('#recSummary');sum.innerHTML='';
+  sum.append(st('개인 최고',s?fmtS(s.best):'—'),st('평균',s?fmtS(s.avg):'—'),st('최근 5회 평균',s?fmtS(s.recent):'—'),st('연습 횟수',list.length+'회'));
+  const fl=$('#recFilter');fl.innerHTML='';
+  [['all','전체'],['basic','기본'],['real','실전'],['random','랜덤'],['exact','정각']].forEach(([k,l])=>{
+    const n=k==='all'?nx().length:all.filter(r=>r.mode===k).length;
+    fl.append(h('button',{class:'chip'+(f===k?' on':''),'data-f':k,text:`${l} ${n}`}));
+  });
+  $$('#recSort button').forEach(b=>b.classList.toggle('on',b.dataset.sort===ui.rec.sort));
+  const byTime=[...list].sort((a,b)=>a.total-b.total),rank=new Map(byTime.map((r,i)=>[r.id,i+1]));
+  const shown=ui.rec.sort==='rank'?byTime:[...list].sort((a,b)=>b.ts-a.ts);
+  const box=$('#recList');box.innerHTML='';
+  if(!shown.length)box.append(h('div',{class:'card'},h('p',{class:'note',text:'아직 기록이 없어요. 연습을 시작해 보세요.'})));
+  shown.forEach(r=>{
+    const k=rank.get(r.id);
+    const d=h('details',{class:'rec'},
+      h('summary',{},h('span',{class:'rk'+(k<=3?' top':''),text:k}),
+        h('span',{class:'rm'},h('b',{text:r.bad?'조기 접수':fmtS(r.total)}),h('small',{text:`${MODES[r.mode]} · ${r.form} · ${fmtDate(r.ts)}`})),
+        h('span',{class:'rms',text:r.bad?'무효':r.rank?r.rank+'위':Math.round(r.total)+'ms'})),
+      rowsEl(detailRows(r)),
+      h('button',{class:'btn danger','data-del':r.id,text:'이 기록 삭제'}));
+    box.append(d);
+  });
+  const names={name:'이름',nick:'닉네임',birth:'생년월일',phone:'전화번호',email:'이메일',member:'멤버십 번호'};
+  const db2=$('#drillBest');db2.innerHTML='';
+  const rows=Object.keys(names).map(t=>{const l=db.drills.filter(x=>x.type===t);return l.length?[names[t],`최고 ${fmtS(Math.min(...l.map(x=>x.best)))} · 평균 ${fmtS(mean(l.map(x=>x.avg)))} · ${l.length}회`]:null}).filter(Boolean);
+  if(rows.length)db2.append(...rowsEl(rows).children);else db2.append(h('p',{class:'note',text:'항목별 연습 기록이 없어요.'}));
+}
+function exportCsv(){
+  const head=['일시','모드','폼','항목수','대기(초)','오픈시각','제출시각','총시간(ms)','첫입력(ms)','입력소요(ms)','제출클릭(ms)','시도오류','오픈오차(ms)'];
+  const q=v=>`"${String(v).replace(/"/g,'""')}"`;
+  const lines=[head.map(q).join(',')].concat(db.records.map(r=>[new Date(r.ts).toLocaleString('ko-KR'),MODES[r.mode],r.form,r.fields,r.delay,fmtClock(r.openAt),fmtClock(r.submitAt),r.bad?'조기접수':r.total.toFixed(1),r.first!=null?r.first.toFixed(1):'',r.typing!=null?r.typing.toFixed(1):'',r.click.toFixed(1),r.fails,r.openErr.toFixed(2)].map(q).join(',')));
+  dl('폼림기록.csv','﻿'+lines.join('\n'),'text/csv;charset=utf-8');
+}
+const exportJson=()=>dl('폼림백업.json',JSON.stringify(db,null,2),'application/json');
+
+/* ---------- 폼 만들기 ---------- */
+function bForm(){let f=db.forms.find(x=>x.id===ui.bForm);if(!f){f=db.forms[0];ui.bForm=f&&f.id}return f}
+const blankForm=()=>({id:uid(),title:'새 연습 폼',desc:'',fields:[F('text','이름',true,{fill:'name'})]});
+function rBuilder(){
+  if(!db.forms.length){db.forms.push(blankForm());save()}
+  const f=bForm(),sel=$('#bForm');sel.innerHTML='';
+  db.forms.forEach(x=>sel.append(h('option',{value:x.id,text:x.title||'(제목 없음)'})));
+  sel.value=f.id;
+  $('#bTitle').value=f.title;$('#bDesc').value=f.desc||'';
+  const ts=$('#bType');if(!ts.options.length)Object.entries(TYPES).forEach(([k,v])=>ts.append(h('option',{value:k,text:v})));
+  renderFields();
+}
+function renderFields(){
+  const f=bForm(),box=$('#bFields');box.innerHTML='';
+  f.fields.forEach((fd,i)=>{
+    const c=h('div',{class:'fcard','data-id':fd.id});
+    c.append(h('div',{class:'fhead'},
+      h('span',{class:'fidx',text:i+1}),
+      h('input',{class:'in f-label',value:fd.label,'aria-label':'항목 이름',placeholder:'항목 이름'}),
+      h('div',{class:'fbtns'},
+        h('button',{class:'ib','data-act':'up',disabled:i===0,'aria-label':'위로 이동',text:'↑'}),
+        h('button',{class:'ib','data-act':'down',disabled:i===f.fields.length-1,'aria-label':'아래로 이동',text:'↓'}),
+        h('button',{class:'ib del','data-act':'del','aria-label':'항목 삭제',text:'삭제'}))));
+    c.append(h('div',{class:'frow'},
+      h('select',{class:'in f-type','aria-label':'항목 유형'},Object.entries(TYPES).map(([k,v])=>h('option',{value:k,text:v,selected:k===fd.type}))),
+      h('label',{class:'opt'},h('input',{type:'checkbox',class:'f-req',checked:!!fd.required}),h('span',{text:'필수'}))));
+    if(fd.type==='text')c.append(h('div',{class:'frow'},h('span',{class:'sm',text:'자동 입력 항목'}),h('select',{class:'in f-fill','aria-label':'자동 입력 항목'},Object.entries(FILLS).map(([k,v])=>h('option',{value:k,text:v,selected:k===(fd.fill||'')})))));
+    if(fd.type==='radio'||fd.type==='checkbox')c.append(h('textarea',{class:'in f-opts',rows:3,'aria-label':'선택지 (한 줄에 하나씩)',placeholder:'선택지를 한 줄에 하나씩 입력'},(fd.options||[]).join('\n')));
+    box.append(c);
+  });
+  if(!f.fields.length)box.append(h('p',{class:'note',text:'항목이 없어요. 아래에서 추가해 주세요.'}));
+}
+function openPreview(form){
+  const pos=db.settings.submitPos==='random'?'bottom':db.settings.submitPos;
+  const f=clone(form);
+  const root=renderForm(f,{pos,onSubmit:()=>{if(validate(root,f))toast('미리보기에서는 제출되지 않아요')}});
+  const b=$('#ovBody');b.innerHTML='';b.append(root);$('#ov').hidden=false;
+}
+const closePreview=()=>{$('#ov').hidden=true};
+
+/* ---------- 항목별 연습 ---------- */
+const DNAMES={name:'이름',nick:'닉네임',birth:'생년월일',phone:'전화번호',email:'이메일',member:'멤버십 번호'};
+const rnd=n=>Math.floor(Math.random()*n);
+function makeTarget(t,rand){
+  const p=db.settings.profile;
+  if(!rand)return p[t]||DNAMES[t];
+  const d=n=>Array.from({length:n},()=>rnd(10)).join('');
+  switch(t){
+    case 'name':return ['김하늘','이서연','박지우','최민준','정유나','한도윤','오세린'][rnd(7)];
+    case 'nick':return ['star','moon','luna','berry','cloud'][rnd(5)]+'_'+d(3);
+    case 'birth':return pad((rnd(16)+90)%100)+pad(rnd(12)+1)+pad(rnd(28)+1);
+    case 'phone':return `010-${d(4)}-${d(4)}`;
+    case 'email':return `fan${d(4)}@example.com`;
+    default:return `FAN-${d(6)}`;
+  }
+}
+const norm=t=>ui.drill.type==='phone'?t.replace(/\D/g,''):t;
+function rDrill(){
+  const box=$('#drillTypes');box.innerHTML='';
+  Object.entries(DNAMES).forEach(([k,v])=>box.append(h('button',{class:'chip'+(ui.drill.type===k?' on':''),'data-dt':k,text:v})));
+  $('#drillCfg').hidden=false;$('#drillPlay').hidden=true;$('#drillRes').hidden=true;
+}
+function drillStart(){
+  const D=ui.drill;
+  D.rounds=parseInt($('#drillRounds').value,10)||5;D.rand=$('#drillRand').checked;
+  D.i=0;D.times=[];D.running=true;
+  $('#drillCfg').hidden=true;$('#drillRes').hidden=true;$('#drillPlay').hidden=false;
+  drillNext();
+}
+function drillNext(){
+  const D=ui.drill;
+  D.target=makeTarget(D.type,D.rand);
+  $('#drillTarget').textContent=D.target;
+  const inp=$('#drillInput');inp.value='';inp.classList.remove('wrong');
+  inp.setAttribute('inputmode',{birth:'numeric',phone:'tel',email:'email'}[D.type]||'text');
+  const dots=$('#drillDots');dots.innerHTML='';
+  for(let k=0;k<D.rounds;k++)dots.append(h('i',{class:k<D.i?'d':k===D.i?'c':''}));
+  D.t0=performance.now();inp.focus();
+}
+function drillCheck(e){
+  const D=ui.drill;if(!D.running)return;
+  const inp=$('#drillInput');if(e&&e.isComposing)return;
+  const ts=e&&e.type==='input'?evTs(e):performance.now();
+  const v=inp.value;
+  inp.classList.toggle('wrong',v!==''&&!norm(D.target).startsWith(norm(v)));
+  if(norm(v)===norm(D.target)){
+    D.times.push(ts-D.t0);D.i++;
+    if(D.i>=D.rounds)drillEnd();else drillNext();
+  }
+}
+function drillEnd(){
+  const D=ui.drill;D.running=false;
+  const rec={id:uid(),ts:Date.now(),type:D.type,rounds:D.times,avg:mean(D.times),best:Math.min(...D.times)};
+  db.drills.push(rec);save();
+  $('#drillPlay').hidden=true;
+  const res=$('#drillRes');res.hidden=false;res.innerHTML='';
+  res.append(h('div',{class:'lab',text:`${DNAMES[D.type]} 연습 결과`}),
+    rowsEl([['평균',fmtS(rec.avg)],['최고',fmtS(rec.best)],...D.times.map((t,i)=>[`${i+1}번째`,fmtS(t)])]),
+    h('button',{class:'btn primary',onclick:drillStart,text:'다시 연습'}),
+    h('button',{class:'btn ghost',onclick:rDrill,text:'항목 바꾸기'}));
+}
+
+/* ---------- 설정 ---------- */
+function rSettings(){fillBindings($('[data-view=settings]'))}
+function mergeImport(d){
+  if(!d||!Array.isArray(d.records))throw new Error('x');
+  const ids=new Set(db.records.map(r=>r.id)),fids=new Set(db.forms.map(f=>f.id));
+  let n=0;
+  d.records.forEach(r=>{if(r&&r.id&&typeof r.total==='number'&&!ids.has(r.id)){db.records.push(r);n++}});
+  (d.forms||[]).forEach(f=>{if(f&&f.id&&Array.isArray(f.fields)&&!fids.has(f.id))db.forms.push(f)});
+  (d.drills||[]).forEach(x=>{if(x&&x.id&&!db.drills.find(y=>y.id===x.id))db.drills.push(x)});
+  save();return n;
+}
+
+/* ---------- 이벤트 ---------- */
+document.addEventListener('input',e=>{
+  const p=e.target.dataset&&e.target.dataset.s;if(!p)return;
+  sp(db.settings,p,e.target.type==='checkbox'?e.target.checked:e.target.value);save();
+  if(p==='randMethod'){$('#poolBox').hidden=e.target.value!=='pool';$('#rangeBox').hidden=e.target.value!=='range'}
+});
+document.addEventListener('click',e=>{
+  const t=e.target;
+  const go=t.closest('[data-go]');if(go){show(go.dataset.go);return}
+  const m=t.closest('#modeSeg button');if(m){ui.mode=m.dataset.mode;db.settings.lastMode=ui.mode;save();rStart();return}
+  const dc=t.closest('[data-delay]');if(dc){db.settings.delay=dc.dataset.delay;save();$('#delay').value=dc.dataset.delay;return}
+  const pl=t.closest('[data-plus]');if(pl){const d=new Date(Date.now()+ +pl.dataset.plus*1000);const k=pl.dataset.t||'realTime';db.settings[k]=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;save();$('#'+k).value=db.settings[k];return}
+  const pc=t.closest('[data-pool]');if(pc){
+    const n=+pc.dataset.pool,p=db.settings.pool;
+    if(p.includes(n)){if(p.length>1)db.settings.pool=p.filter(x=>x!==n);else toast('후보를 하나 이상 선택해 주세요')}else db.settings.pool=[...p,n].sort((a,b)=>a-b);
+    save();rStart();return;
+  }
+  const rf=t.closest('#recFilter [data-f]');if(rf){ui.rec.filter=rf.dataset.f;rRecords();return}
+  const rs=t.closest('#recSort [data-sort]');if(rs){ui.rec.sort=rs.dataset.sort;rRecords();return}
+  const rd=t.closest('[data-del]');if(rd){armConfirm(rd,()=>{db.records=db.records.filter(r=>r.id!==rd.dataset.del);save();rRecords();toast('기록을 삭제했어요')});return}
+  const dt=t.closest('[data-dt]');if(dt){ui.drill.type=dt.dataset.dt;$$('#drillTypes .chip').forEach(c=>c.classList.toggle('on',c===dt));return}
+  const act=t.closest('#bFields [data-act]');
+  if(act){
+    const f=bForm(),id=act.closest('.fcard').dataset.id,i=f.fields.findIndex(x=>x.id===id);
+    if(act.dataset.act==='del')f.fields.splice(i,1);
+    else{const j=act.dataset.act==='up'?i-1:i+1;if(j>=0&&j<f.fields.length)[f.fields[i],f.fields[j]]=[f.fields[j],f.fields[i]]}
+    save();renderFields();return;
+  }
+  if(t.id==='ov')closePreview();
+});
+$('#ovClose').onclick=closePreview;
+$('#beginBtn').onclick=begin;
+$('#prevBtn').onclick=()=>openPreview(getForm());
+$('#cancelWait').onclick=()=>{cancelRun();show('start')};
+$('#stopRun').onclick=()=>{cancelRun();show('start')};
+$('#afBtn').onclick=doAutofill;
+$('#simBtn').onclick=()=>{
+  const ck=parseFloat(db.settings.clk)||0,rows=[];curN=nApp(((+db.settings.pickMin||50)+(+db.settings.pickMax||100))/2);
+  for(const q of [.05,.1,.3]){let o=-5000;for(;o<3000;o+=10)if(sim(o,ck,400)[0]<=q)break;const m=sim(o,ck,2000)[1];rows.push([`조기(무효) ${q*100}% 이하`,`${o}ms → 중앙 접수 ${sg(m)}`])}
+  const out=$('#simOut');out.innerHTML='';out.append(...rowsEl(rows).children);
+};
+$('#againBtn').onclick=againRun;
+$('#saveOne').onclick=()=>{if(ui.last)dl(`폼림결과_${ui.last.id}.json`,JSON.stringify(ui.last,null,2),'application/json')};
+$('#expCsv').onclick=()=>db.records.length?exportCsv():toast('내보낼 기록이 없어요');
+$('#expJson').onclick=exportJson;
+$('#sExport').onclick=exportJson;
+$('#resetRec').onclick=e=>armConfirm(e.currentTarget,()=>{db.records=[];db.drills=[];save();rRecords();toast('기록을 초기화했어요')});
+$('#sReset').onclick=e=>armConfirm(e.currentTarget,()=>{db=fresh();ui.bForm=null;ui.mode='basic';save();rSettings();toast('모두 초기화했어요')});
+$('#sImport').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{const n=mergeImport(JSON.parse(rd.result));toast(`기록 ${n}개를 불러왔어요`)}catch(x){toast('백업 파일을 읽을 수 없어요')}e.target.value=''};
+  rd.readAsText(f);
+};
+/* 폼 만들기 */
+$('#bForm').onchange=e=>{ui.bForm=e.target.value;rBuilder()};
+$('#bTitle').oninput=e=>{const f=bForm();f.title=e.target.value;save();const o=$('#bForm').selectedOptions[0];if(o)o.textContent=f.title||'(제목 없음)'};
+$('#bDesc').oninput=e=>{bForm().desc=e.target.value;save()};
+$('#bNew').onclick=()=>{const f=blankForm();db.forms.push(f);ui.bForm=f.id;save();rBuilder();toast('새 폼을 만들었어요')};
+$('#bDup').onclick=()=>{const f=clone(bForm());f.id=uid();f.title+=' 복사본';f.fields.forEach(x=>x.id=uid());db.forms.push(f);ui.bForm=f.id;save();rBuilder();toast('폼을 복제했어요')};
+$('#bDel').onclick=e=>{
+  if(db.forms.length<2){toast('폼이 하나 이상 있어야 해요');return}
+  armConfirm(e.currentTarget,()=>{db.forms=db.forms.filter(x=>x.id!==ui.bForm);ui.bForm=null;save();rBuilder();toast('폼을 삭제했어요')});
+};
+$('#bAdd').onclick=()=>{
+  const f=bForm(),ty=$('#bType').value,x=F(ty,DEFLABEL[ty],true);
+  if(ty==='radio'||ty==='checkbox')x.options=['선택지 1','선택지 2'];
+  if(ty==='text')x.fill='name';
+  f.fields.push(x);save();renderFields();
+  const c=$('#bFields').lastElementChild;if(c)c.scrollIntoView({block:'center',behavior:'smooth'});
+};
+$('#bPrev').onclick=()=>openPreview(bForm());
+$('#bUse').onclick=()=>{db.settings.lastForm=bForm().id;save();show('start')};
+$('#bFields').addEventListener('input',e=>{
+  const c=e.target.closest('.fcard');if(!c)return;
+  const fd=bForm().fields.find(x=>x.id===c.dataset.id);if(!fd)return;
+  if(e.target.classList.contains('f-label'))fd.label=e.target.value;
+  if(e.target.classList.contains('f-opts'))fd.options=e.target.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  save();
+});
+$('#bFields').addEventListener('change',e=>{
+  const c=e.target.closest('.fcard');if(!c)return;
+  const fd=bForm().fields.find(x=>x.id===c.dataset.id);if(!fd)return;
+  const cl=e.target.classList;
+  if(cl.contains('f-req'))fd.required=e.target.checked;
+  if(cl.contains('f-fill'))fd.fill=e.target.value;
+  if(cl.contains('f-type')){
+    fd.type=e.target.value;
+    if((fd.type==='radio'||fd.type==='checkbox')&&!(fd.options&&fd.options.length))fd.options=['선택지 1','선택지 2'];
+    save();renderFields();return;
+  }
+  save();
+});
+/* 항목별 연습 */
+$('#drillStart').onclick=drillStart;
+$('#drillStop').onclick=()=>{ui.drill.running=false;rDrill()};
+$('#drillInput').addEventListener('input',drillCheck);
+$('#drillInput').addEventListener('compositionend',()=>drillCheck());
+/* 키보드 단축키 */
+addEventListener('keydown',e=>{
+  const tag=(e.target.tagName||'').toLowerCase(),typing=['input','textarea','select'].includes(tag),v=ui.view;
+  if(e.key==='Escape'){
+    if(!$('#ov').hidden){closePreview();return}
+    if(v==='wait'){cancelRun();show('start')}
+    else if(['start','records','builder','drill','settings','result'].includes(v)){ui.drill.running=false;show('home')}
+    return;
+  }
+  if(v==='run'){
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runSubmit(performance.now())}
+    else if(e.altKey&&e.code==='KeyA'){e.preventDefault();doAutofill()}
+    return;
+  }
+  if(typing||e.ctrlKey||e.metaKey||e.altKey||!$('#ov').hidden)return;
+  const c=e.code;
+  if(v==='home'){const m={KeyS:'start',KeyG:'records',KeyT:'settings',KeyB:'builder',KeyD:'drill'}[c];if(m){e.preventDefault();show(m)}}
+  else if(v==='start'){
+    if(e.key==='Enter'){e.preventDefault();begin()}
+    const k={Digit1:'basic',Digit2:'real',Digit3:'random',Digit4:'exact'}[c];if(k){ui.mode=k;db.settings.lastMode=k;save();rStart()}
+  }else if(v==='result'){
+    if(c==='KeyR'||e.key==='Enter'){e.preventDefault();againRun()}
+    else if(c==='KeyH')show('home');
+    else if(c==='KeyG')show('records');
+  }
+});
+/* 탭이 다시 보일 때 대기 카운트다운 복구 */
+document.addEventListener('visibilitychange',()=>{const r=ui.run;if(r&&r.state==='wait'&&!document.hidden){cancelAnimationFrame(r.raf);r.raf=requestAnimationFrame(tick)}});
+
+show('home');
+})();
+</script>
+</body>
+</html>
