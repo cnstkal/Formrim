@@ -73,7 +73,7 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 <button class="btn line" onclick="realList()">실제 신청 기록</button>
 <h3>개인 최고 기록</h3><div class="best" id="best"></div>
 <h3>최근 연습 기록</h3><div id="list"></div></section>
-<section id="setup" hidden><button class="back" onclick="home()">← 뒤로</button><h2>목표 시각 설정</h2><p class="mu">이 시각 정각에 맞춰 제출 버튼을 눌러요.</p>
+<section id="setup" hidden><button class="back" onclick="home()">← 뒤로</button><h2>목표 시각 설정</h2><p class="mu">이 시각 정각에 맞춰 제출 버튼을 눌러요.</p><p class="mu" id="sy" style="margin:-6px 0 6px"></p>
 <div class="seg" id="seg"><button data-k="pub" class="on">공개방송</button><button data-k="last">막방</button><button data-k="mini">미팬</button></div><p class="mu" id="kn"></p>
 <label class="mu" for="pk" style="display:block;margin-top:14px">선발 인원 (10명 단위, 비우면 자동)</label><input class="tm" id="pk" type="number" min="10" step="10" placeholder="자동" style="font-size:22px;height:52px;min-height:52px;margin:8px 0 12px"><input class="tm" id="t" type="time" step="60"><button class="btn" onclick="start()">연습 시작</button><button class="btn line" onclick="quick()">다음 10초 정각으로 바로 시작</button></section>
 <section id="form" hidden>
@@ -133,6 +133,25 @@ const rcv=c=>c+netLat(c/1000);
 function other(){const u=Math.random();let c=u<.25?-250+gs()*300:u<.85?250+gs()*250:500-Math.log(1-Math.random())*1500,r=rcv(c);
  for(let k=0;r<0&&k<3;k++){c=r+300+Math.random()*500;r=rcv(c)}return r<0?1e9:r}
 const label=r=>r.rank!=null?(r.bad?'무효':(r.ok?'합격 ':'탈락 ')+r.rank+'번째'):fmtD(r.diff);
+/* 표준시 보정 (UTCk와 같은 아이디어): 시간 서버와 PC 시계의 차이(OFF)를 재서 화면 시계·목표 시각 계산에만 반영.
+   브라우저는 PC 시계 자체를 바꿀 수 없음. 서버 응답 왕복(RTT)의 절반을 오차로 보고, 5회 중 RTT가 가장 짧은 값을 사용.
+   시뮬레이션의 판정·지연 계산은 내부 기준이 같아 영향 없음. 실패하면 OFF=0(PC 시계 그대로) */
+let OFF=0,syncing=false;
+const now=()=>Date.now()+OFF;
+const TSRC=[
+ ['https://www.cloudflare.com/cdn-cgi/trace',t=>{const m=/^ts=(\d+\.\d+)/m.exec(t);return m?parseFloat(m[1])*1000:NaN}],
+ ['https://timeapi.io/api/Time/current/zone?timeZone=Asia/Seoul',t=>{const m=/(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)\.(\d+)/.exec(JSON.parse(t).dateTime);return m?Date.UTC(+m[1],m[2]-1,+m[3],+m[4]-9,+m[5],+m[6])+Math.floor(+('0.'+m[7])*1000):NaN}]];
+async function probe(u,parse){const a=Date.now(),p0=performance.now();
+ const t=await(await fetch(u+(u.includes('?')?'&':'?')+'_='+Math.random(),{cache:'no-store'})).text();
+ const p1=performance.now(),T=parse(t);if(!isFinite(T))throw 0;return{rtt:p1-p0,off:T-(a+(p1-p0)/2)}}
+async function syncTime(){
+ if(syncing)return;syncing=true;const el=$('#sy');el.textContent='표준시 보정 중…';let ok=null;
+ for(const[u,p]of TSRC){const S=[];for(let i=0;i<5;i++){try{S.push(await probe(u,p))}catch(e){break}}
+  if(S.length){S.sort((x,y)=>x.rtt-y.rtt);ok={off:S[0].off,err:S[0].rtt/2};break}}
+ syncing=false;
+ if(!ok){OFF=0;el.textContent='표준시 보정 실패 · PC 시계 그대로 동작해요';return}
+ OFF=ok.off;const a=Math.abs(Math.round(OFF));
+ el.textContent=`표준시 보정됨 · PC 시계가 ${a<5?'표준시와 거의 일치':fmtA(a)+(OFF<0?' 빠름':' 느림')} (오차 ±${Math.max(1,Math.round(ok.err))}ms)`}
 function home(){
  if(R){clearTimeout(R.to);R=null}
  const L=recs().filter(r=>r&&r.mode==='exact'&&typeof r.ts==='number'&&typeof r.diff==='number').sort((a,b)=>b.ts-a.ts);
@@ -142,11 +161,11 @@ function home(){
  show('home')}
 function sync(){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.k===kind));$('#kn').textContent=KINDS[kind][3]}
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{kind=b.dataset.k;sync()});
-function setup(){sync();const d=new Date(Math.ceil((Date.now()+30000)/60000)*60000);$('#t').value=`${pad(d.getHours())}:${pad(d.getMinutes())}`;show('setup')}
-function quick(){window.QD=Math.ceil((Date.now()+3000)/10000)*10000;start()}
+function setup(){sync();const d=new Date(Math.ceil((now()+30000)/60000)*60000);$('#t').value=`${pad(d.getHours())}:${pad(d.getMinutes())}`;show('setup');syncTime()}
+function quick(){window.QD=Math.ceil((now()+3000)/10000)*10000;start()}
 function start(){
  let d;if(window.QD){d=new Date(window.QD);window.QD=0}else{const[h,m]=$('#t').value.split(':').map(Number);d=new Date();d.setHours(h,m||0,0,0)}
- const rem=d-Date.now();if(isNaN(rem)||rem<2000)return toast('지금보다 2초 이상 뒤의 시각을 정해 주세요');
+ const rem=d-now();if(isNaN(rem)||rem<2000)return toast('지금보다 2초 이상 뒤의 시각을 정해 주세요');
  const pick=r10(+$('#pk').value)||(Math.random()<.8?r10(300+Math.random()*90):r10(250+Math.random()*50));curN=nApp(pick,kind);curC=Math.min(1.8,Math.max(.6,Math.exp(.25*gs()))); // 세션마다 서버 상태가 달라 같은 조건도 결과가 다름
  const r=R={tgt:performance.now()+rem,tgtAt:d.getTime(),pick,N:curN,kind};
  document.querySelectorAll('.fi').forEach(i=>{i.value=i.defaultValue;i.classList.remove('err')});$('#ag1').checked=true;
@@ -219,5 +238,5 @@ function realOpen(n){
   +`<h3>메모</h3><p class="memo">${esc(r.memo)}</p>`;
  show('rdet')}
 function quit(){home()}
-home();
+home();syncTime();
 </script></body></html>
