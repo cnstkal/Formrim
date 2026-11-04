@@ -112,7 +112,7 @@ function setup(){sync();const d=new Date(Date.now()+30000);$('#t').value=`${pad(
 function start(){
  const [h,m,s]=$('#t').value.split(':').map(Number),d=new Date();d.setHours(h,m||0,s||0,0);
  const rem=d-Date.now();if(isNaN(rem)||rem<2000)return toast('지금보다 2초 이상 뒤의 시각을 정해 주세요');
- const pick=r10(250+Math.random()*150);curN=nApp(pick,kind);
+ const pick=Math.random()<.8?r10(300+Math.random()*90):r10(250+Math.random()*50);curN=nApp(pick,kind);
  const r=R={tgt:performance.now()+rem,tgtAt:d.getTime(),pick,N:curN,kind};
  document.querySelectorAll('.fi').forEach(i=>{i.value=i.defaultValue;i.classList.remove('err')});$('#ag1').checked=true;
  $('#cap').textContent=`${KINDS[kind][0]} · 선발 ${pick}명 · 예비 10명`;$('#sub').disabled=false;$('#sub').textContent='제출';$('#tg').textContent=fmtT(r.tgtAt);
