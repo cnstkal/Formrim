@@ -207,9 +207,9 @@ textarea.fi{resize:vertical}
     <div class="mpanel stack" data-mp="exact" hidden>
       <div><label class="lab" for="exactTime">정각 제출 시각 (시:분:초)</label><input class="in" id="exactTime" type="time" step="1" data-s="exactTime"></div>
       <div class="chips"><button class="chip" data-plus="30" data-t="exactTime">30초 뒤</button><button class="chip" data-plus="60" data-t="exactTime">1분 뒤</button><button class="chip" data-plus="180" data-t="exactTime">3분 뒤</button><button class="chip" data-plus="600" data-t="exactTime">10분 뒤</button></div>
-      <label class="lab" for="evt">이벤트</label><select class="in" id="evt" data-s="evt"><option value="n">일반</option><option value="sp">막방·미팬 (인원 폭주)</option></select>
+      <label class="lab" for="evt">이벤트</label><select class="in" id="evt" data-s="evt"><option value="n">일반</option><option value="ml">막방 (많이 몰림)</option><option value="mp">미팬 (가장 심함)</option></select>
       <div class="row2"><div><label class="lab" for="pickMin">선발 인원 최소</label><input class="in" id="pickMin" type="number" min="1" step="10" data-s="pickMin"></div><div><label class="lab" for="pickMax">선발 인원 최대</label><input class="in" id="pickMax" type="number" min="1" step="10" data-s="pickMax"></div></div>
-      <p class="note">매 판 선발 인원이 이 범위에서 랜덤으로 정해지고, 신청자는 선발이 많을수록 늘어나요 (일반 약 4배, 막방·미팬 약 10배). 인원은 10명 단위, 예비는 10명.</p>
+      <p class="note">매 판 선발 인원이 이 범위에서 랜덤으로 정해지고, 신청자는 선발이 많을수록 늘어나요 (일반 약 4배, 막방 약 14배, 미팬 약 18배 → 선발 100명이면 최대 1400명/1800명). 인원은 10명 단위, 예비는 10명.</p>
       <div class="row2"><div><label class="lab" for="macro">매크로 클릭 (정각 대비 ms)</label><input class="in" id="macro" type="number" step="10" placeholder="비움=수동" data-s="macro"></div><div><label class="lab" for="clk">서버 시계 오차 (ms)</label><input class="in" id="clk" type="number" step="10" data-s="clk"></div></div>
       <p class="note">매크로 값을 넣으면 내 PC 시계 기준 정각+값(ms)에 자동으로 제출해요. 오차는 서버 시계가 내 PC보다 빠르면 +.</p>
       <button class="btn ghost" id="simBtn">최적 ms 찾기 (시뮬레이션)</button><div class="rows" id="simOut"></div>
@@ -629,7 +629,7 @@ function netLat(tc){
   return Math.min(10000,40+Math.random()*60+N*1.1*w*Math.exp(.5*g));
 }
 let curN=0;
-const r10=x=>Math.round(x/10)*10,nApp=p=>r10(p*(db.settings.evt==='sp'?10:4)*(.97+Math.random()*.06));
+const r10=x=>Math.round(x/10)*10,nApp=p=>r10(p*({ml:14,mp:18}[db.settings.evt]||4)*(.97+Math.random()*.06));
 const gs=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
 const rcv=c=>c+netLat(c/1000);
 /* 다른 신청자 1명의 서버 접수 시각(정각 대비 ms): 25% 일찍 누르는 매크로형, 60% 정각 직후 반응, 15% 느린 사람. 조기 거절되면 재시도 */
