@@ -210,7 +210,7 @@ function result(r,O){
  let h=r.bad?row(r.tgtAt+r.diff,1,'무효'):'';
  all.forEach(([x,me],i)=>{h+=row(r.tgtAt+x,me,me?r.rank+'번째':'');if(i+1===r.pick)h+=`<div class="cut">▲ 선발 ${r.pick}명까지</div>`});
  $('#sm').innerHTML=(r.bad?`<b class="bad">무효</b><span>정각보다 ${fmtA(Math.round(-r.diff))} 일찍 접수돼 인정되지 않았어요</span>`
-  :`<b class="${r.ok?'ok':'no'}">${r.ok?'합격':r.rank<=r.pick+10?'예비':'탈락'} · ${r.rank}번째</b><span>${KINDS[r.kind||'pub'][0]} · 선발 ${r.pick}명 · 신청 ${all.length}명</span>`)
+  :`<b class="${r.ok?'ok':'no'}">${r.ok?'합격':r.rank<=r.pick+10?'예비':'탈락'} · ${r.rank}번째</b><span>${KINDS[r.kind||'pub'][0]} · 선발 ${r.pick}명 · 신청 ${all.length}명${all[r.pick-1]?` · 마지막 합격 접수 +${Math.round(all[r.pick-1][0])}ms`:''}</span>`)
   ;$('#dt').innerHTML=detail(r);
  $('#cnt').textContent=`${O.length+(r.bad?0:1)}건 제출됨`;$('#ll').innerHTML=h;
  $('#jump').textContent=r.bad?'내 신청으로 이동':`내 신청으로 이동 · ${r.rank}번째`;show('lst')}
