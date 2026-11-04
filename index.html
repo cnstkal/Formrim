@@ -185,8 +185,10 @@ $('#sub').onclick=e=>{
  // 클릭 오차(ts-r.tgt)와 서버 지연(lat)은 별개: 서버 접수 = 클릭 + 서버 지연, 응답 수신 = 접수 + 회신 시간
  const tcl=(ts-r.tgt)/1000,L=curN*trf(tcl),lat=netLat(tcl),diff=ts+lat-r.tgt,down=20+Math.random()*50+lat*.04;
  const O=[];for(let i=1;i<r.N;i++)O.push(other(r.N,r.pick));O.sort((a,b)=>a-b);
+ // 접수 마지노선: 기본 500ms 넘으면 탈락. 매우 혼잡+지연 심한 경우에만 드물게(5%) 1.15초까지 인정
+ const cut=lvOf(L)==='매우 혼잡'&&lat>1000&&Math.random()<.05?1150:500;
  let rank=0;if(diff>=0){rank=1;for(const x of O){if(x<diff)rank++;else break}}
- const rec={id:Math.random().toString(36).slice(2,10),ts:Date.now(),mode:'exact',form:KINDS[r.kind][0]+' 참여 신청',kind:r.kind,diff,total:Math.abs(diff),bad:diff<0,lat,lvl:lvOf(L),load:Math.round(L),down,resp:lat+down,pick:r.pick,N:r.N,rank,ok:rank>0&&rank<=r.pick,tgtAt:r.tgtAt,click:ts-r.tgt,submitAt:r.tgtAt+ts-r.tgt};
+ const rec={id:Math.random().toString(36).slice(2,10),ts:Date.now(),mode:'exact',form:KINDS[r.kind][0]+' 참여 신청',kind:r.kind,diff,total:Math.abs(diff),bad:diff<0,lat,lvl:lvOf(L),load:Math.round(L),down,resp:lat+down,pick:r.pick,N:r.N,rank,cut,ok:rank>0&&rank<=r.pick&&diff<=cut,tgtAt:r.tgtAt,click:ts-r.tgt,submitAt:r.tgtAt+ts-r.tgt};
  e.currentTarget.disabled=true;e.currentTarget.textContent='제출 중…';
  r.to=setTimeout(()=>{if(R!==r)return;addRec(rec);result(rec,O)},Math.min(lat+down,12000))};
 const fmtDT=ms=>{const d=new Date(ms);return`${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${fmtT(ms)}`};
@@ -209,7 +211,7 @@ function result(r,O){
  let h=r.bad?row(r.tgtAt+r.diff,1,'무효'):'';
  all.forEach(([x,me],i)=>{h+=row(r.tgtAt+x,me,me?r.rank+'번째':'');if(i+1===r.pick)h+=`<div class="cut">▲ 선발 ${r.pick}명까지</div>`});
  $('#sm').innerHTML=(r.bad?`<b class="bad">무효</b><span>정각보다 ${fmtA(Math.round(-r.diff))} 일찍 접수돼 인정되지 않았어요</span>`
-  :`<b class="${r.ok?'ok':'no'}">${r.ok?'합격':r.rank<=r.pick+10?'예비':'탈락'} · ${r.rank}번째</b><span>${KINDS[r.kind||'pub'][0]} · 선발 ${r.pick}명 · 신청 ${all.length}명</span>`)
+  :`<b class="${r.ok?'ok':'no'}">${r.ok?'합격':r.rank<=r.pick+10&&r.diff<=r.cut?'예비':'탈락'} · ${r.rank}번째</b><span>${KINDS[r.kind||'pub'][0]} · 선발 ${r.pick}명 · 신청 ${all.length}명 · 접수 마지노선 ${r.cut}ms</span>`)
   ;$('#dt').innerHTML=detail(r);
  $('#cnt').textContent=`${O.length+(r.bad?0:1)}건 제출됨`;$('#ll').innerHTML=h;
  $('#jump').textContent=r.bad?'내 신청으로 이동':`내 신청으로 이동 · ${r.rank}번째`;show('lst')}
