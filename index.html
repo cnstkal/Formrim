@@ -128,10 +128,12 @@ const KINDS={pub:['공개방송',1,1,'선발 270명 → 신청 약 1500명 · 38
 const r10=x=>Math.round(x/10)*10;
 // 선발 250명 이상은 기존 식, 그보다 적으면 신청자도 비례해서 크게 줄어듦(선발이 적을수록 한산)
 const nApp=(p,k)=>r10((p>=250?1500+(p-270)*1.8:1464*Math.pow(p/250,.8))*KINDS[k][1]*(.97+Math.random()*.06));
-const rcv=c=>c+netLat(c/1000);
-/* 다른 신청자 1명의 서버 접수 시각(정각 대비 ms): 25% 일찍 누르는 사람, 60% 정각 직후, 15% 느린 사람. 조기 거절 시 재시도 */
-function other(){const u=Math.random();let c=u<.25?-250+gs()*300:u<.85?250+gs()*250:500-Math.log(1-Math.random())*1500,r=rcv(c);
- for(let k=0;r<0&&k<3;k++){c=r+300+Math.random()*500;r=rcv(c)}return r<0?1e9:r}
+/* 다른 신청자 1명의 서버 접수 시각(정각 대비 ms). 사용자 기준: 정각 뒤 약 0.5초 안쪽 접수가 선발 인원 정도 되도록 맞춤
+   N명 중 P/N 비율(약 ±5% 흔들림)은 0.5초 안에 접수, 나머지는 0.5초 뒤부터 긴 꼬리(가끔 1~3초 추가 지연) */
+function other(N,P){
+ const q=Math.min(.97,P/N*(.95+Math.random()*.1));
+ if(Math.random()<q)return 20+Math.random()*480;
+ return 500+(Math.random()<.05?1000+Math.random()*2000:-Math.log(1-Math.random())*1200)}
 const label=r=>r.rank!=null?(r.bad?'무효':(r.ok?'합격 ':'탈락 ')+r.rank+'번째'):fmtD(r.diff);
 /* 표준시 보정 (UTCk와 같은 아이디어): 시간 서버와 PC 시계의 차이(OFF)를 재서 화면 시계·목표 시각 계산에만 반영.
    브라우저는 PC 시계 자체를 바꿀 수 없음. 서버 응답 왕복(RTT)의 절반을 오차로 보고, 5회 중 RTT가 가장 짧은 값을 사용.
@@ -182,7 +184,7 @@ $('#sub').onclick=e=>{
  r.done=1;
  // 클릭 오차(ts-r.tgt)와 서버 지연(lat)은 별개: 서버 접수 = 클릭 + 서버 지연, 응답 수신 = 접수 + 회신 시간
  const tcl=(ts-r.tgt)/1000,L=curN*trf(tcl),lat=netLat(tcl),diff=ts+lat-r.tgt,down=20+Math.random()*50+lat*.04;
- const O=[];for(let i=1;i<r.N;i++){const x=other();if(x<1e8)O.push(x)}O.sort((a,b)=>a-b);
+ const O=[];for(let i=1;i<r.N;i++)O.push(other(r.N,r.pick));O.sort((a,b)=>a-b);
  let rank=0;if(diff>=0){rank=1;for(const x of O){if(x<diff)rank++;else break}}
  const rec={id:Math.random().toString(36).slice(2,10),ts:Date.now(),mode:'exact',form:KINDS[r.kind][0]+' 참여 신청',kind:r.kind,diff,total:Math.abs(diff),bad:diff<0,lat,lvl:lvOf(L),load:Math.round(L),down,resp:lat+down,pick:r.pick,N:r.N,rank,ok:rank>0&&rank<=r.pick,tgtAt:r.tgtAt,click:ts-r.tgt,submitAt:r.tgtAt+ts-r.tgt};
  e.currentTarget.disabled=true;e.currentTarget.textContent='제출 중…';
