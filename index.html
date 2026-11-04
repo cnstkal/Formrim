@@ -54,7 +54,7 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 <h3>최근 연습 기록</h3><div id="list"></div></section>
 <section id="setup" hidden><button class="back" onclick="home()">← 뒤로</button><h2>목표 시각 설정</h2><p class="mu">이 시각 정각에 맞춰 제출 버튼을 눌러요.</p>
 <div class="seg" id="seg"><button data-k="pub" class="on">공개방송</button><button data-k="last">막방</button><button data-k="mini">미팬</button></div><p class="mu" id="kn"></p>
-<input class="tm" id="t" type="time" step="1"><button class="btn" onclick="start()">연습 시작</button></section>
+<input class="tm" id="t" type="time" step="60"><button class="btn" onclick="start()">연습 시작</button></section>
 <section id="form" hidden>
 <div class="top"><button onclick="quit()" aria-label="뒤로"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
 <div class="clk">목표 <b id="tg"></b><br>현재 <b id="nw"></b></div></div>
@@ -110,9 +110,9 @@ function home(){
  show('home')}
 function sync(){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.k===kind));$('#kn').textContent=KINDS[kind][3]}
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{kind=b.dataset.k;sync()});
-function setup(){sync();const d=new Date(Date.now()+30000);$('#t').value=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;show('setup')}
+function setup(){sync();const d=new Date(Math.ceil((Date.now()+30000)/60000)*60000);$('#t').value=`${pad(d.getHours())}:${pad(d.getMinutes())}`;show('setup')}
 function start(){
- const [h,m,s]=$('#t').value.split(':').map(Number),d=new Date();d.setHours(h,m||0,s||0,0);
+ const [h,m,s]=$('#t').value.split(':').map(Number),d=new Date();d.setHours(h,m||0,0,0);
  const rem=d-Date.now();if(isNaN(rem)||rem<2000)return toast('지금보다 2초 이상 뒤의 시각을 정해 주세요');
  const pick=Math.random()<.8?r10(300+Math.random()*90):r10(250+Math.random()*50);curN=nApp(pick,kind);
  const r=R={tgt:performance.now()+rem,tgtAt:d.getTime(),pick,N:curN,kind};
