@@ -49,7 +49,7 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 @keyframes fl{0%,60%{background:#ffc2da}100%{background:var(--pl)}}
 .cut{padding:8px 0;text-align:center;color:var(--p);font-weight:700;font-size:12px;border-bottom:2px dashed var(--pb)}
 .jump{position:fixed;left:22px;right:22px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:476px;margin:0 auto;height:48px;border:0;border-radius:14px;background:var(--p);color:#fff;font:inherit;font-size:16px;font-weight:700;box-shadow:0 4px 14px rgba(236,107,154,.35)}
-.seg{display:flex;gap:8px;margin:16px 0 8px}.seg button{flex:1;height:46px;border:1.5px solid var(--pb);background:#fff;border-radius:12px;font:inherit;font-weight:700;color:var(--mu)}.seg button.on{background:var(--pl);color:var(--p);border-color:var(--p)}
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 8px}.seg button{flex:1 1 28%;height:46px;border:1.5px solid var(--pb);background:#fff;border-radius:12px;font:inherit;font-weight:700;color:var(--mu)}.seg button.on{background:var(--pl);color:var(--p);border-color:var(--p)}
 /* 실제 신청 기록 */
 .rc{display:block;width:100%;border:0;border-bottom:1px solid #f3e6ec;background:none;text-align:left;font:inherit;color:var(--tx);padding:14px 0}.rc:active{opacity:.6}
 .rc .h{display:flex;align-items:center;gap:8px}.rc .h b{font-size:16px}.rc .h i{font-style:normal;color:var(--mu);font-size:13px}
@@ -74,8 +74,8 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 <h3>개인 최고 기록</h3><div class="best" id="best"></div>
 <h3>최근 연습 기록</h3><div id="list"></div></section>
 <section id="setup" hidden><button class="back" onclick="home()">← 뒤로</button><h2>목표 시각 설정</h2><p class="mu">이 시각 정각에 맞춰 제출 버튼을 눌러요.</p><p class="mu" id="sy" style="margin:-6px 0 6px"></p>
-<div class="seg" id="seg"><button data-k="pub" class="on">공개방송</button><button data-k="wk">주말 공방</button><button data-k="last">막방</button><button data-k="mini">미팬</button></div><p class="mu" id="kn"></p>
-<label class="mu" for="pk" style="display:block;margin-top:14px">선발 인원 (10명 단위, 비우면 자동)</label><input class="tm" id="pk" type="number" min="10" step="10" placeholder="자동" style="font-size:22px;height:52px;min-height:52px;margin:8px 0 12px"><input class="tm" id="t" type="time" step="60"><button class="btn" onclick="start()">연습 시작</button><button class="btn line" onclick="quick()">다음 10초 정각으로 바로 시작</button></section>
+<div class="seg" id="seg"><button data-k="mb" class="on">뮤직뱅크</button><button data-k="mc">음악중심</button><button data-k="ig">인기가요</button><button data-k="last">막방</button><button data-k="mini">미팬</button></div><p class="mu" id="kn"></p>
+<label class="mu" for="pk" style="display:block;margin-top:14px">선발 인원 (10명 단위, 비우면 자동)</label><input class="tm" id="pk" type="number" min="10" step="10" placeholder="자동" style="font-size:22px;height:52px;min-height:52px;margin:8px 0 12px"><label class="mu" for="rv" style="display:block">예비 인원 (비우면 자동)</label><input class="tm" id="rv" type="number" min="1" step="10" placeholder="자동" style="font-size:22px;height:52px;min-height:52px;margin:8px 0 12px"><input class="tm" id="t" type="time" step="60"><button class="btn" onclick="start()">연습 시작</button><button class="btn line" onclick="quick()">다음 10초 정각으로 바로 시작</button></section>
 <section id="form" hidden>
 <div class="top"><button onclick="quit()" aria-label="뒤로"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
 <div class="clk">목표 <b id="tg"></b><br>현재 <b id="nw"></b></div></div>
@@ -99,7 +99,7 @@ h1{font-size:26px;margin:20px 0 20px}h2{font-size:24px;margin:8px 0}h3{font-size
 <h2>실제 신청 기록</h2><p class="rn">실제 사이트에서 신청한 기록이에요. 적어 둔 원본 그대로 보여주며, <b>실제 결과 시각은 클릭 시각이 아니에요.</b></p><div id="rl"></div></section>
 <section id="rdet" hidden><div class="top"><button onclick="realList()" aria-label="목록"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button></div><div id="rdc"></div></section>
 </main><script>
-const KEY='formrim.v1',$=s=>document.querySelector(s),pad=(n,l=2)=>String(n).padStart(l,'0');let R=null,curN=0,curC=1,kind='pub';
+const KEY='formrim.v1',$=s=>document.querySelector(s),pad=(n,l=2)=>String(n).padStart(l,'0');let R=null,curN=0,curC=1,kind='mb';
 // 저장: 기존 기록(formrim.v1)을 그대로 읽고 새 기록만 추가
 const store=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}};
 const recs=()=>{const d=store();return Array.isArray(d.records)?d.records:[]};
@@ -123,18 +123,22 @@ const LVS=[[1000,'매우 혼잡'],[450,'혼잡'],[150,'보통'],[0,'한산']],lv
 function netLat(tc){const N=curN||1350,w=trf(tc),L=N*w;let d=130+Math.random()*90+N*.95*w*curC*Math.exp(.5*gs()); // 기본 130~220ms: 관측 최소가 약 150ms라 100ms 일찍 눌러도 정각 이전 접수는 안 됨
  if(Math.random()<Math.min(.12,Math.max(0,(L-600)/12000)))d*=1.5+Math.random()*1.5;
  return Math.min(15000,d)}
-// 종류: [이름, 신청자 최소, 최대, 안내]. 신청자는 선발(200~400) 비례. 막방·미팬은 트래픽 대폭 증가
-const KINDS={pub:['공개방송',1,1,'선발 320명 → 신청 약 1800명 (뮤직뱅크 · 금요일 새벽 녹화 기준)'],wk:['주말 공방',1.08,1.08,'음악중심·인기가요 · 뮤직뱅크보다 약 100~200명 더 몰림'],last:['막방',1.1,1.1,'평소보다 조금 더 몰림'],mini:['미팬',1.25,1.25,'가장 심하게 몰림']};
+// 종류: [이름, 신청자 배율 최소, 최대, 안내]. 막방·미팬은 트래픽 대폭 증가
+// pub·wk는 예전 기록(localStorage)을 표시하기 위해서만 남겨 둠 (화면 버튼에는 없음)
+const KINDS={mb:['뮤직뱅크',1,1,'선발 300명 · 예비 10 또는 20명 · 신청 약 1800명 (금요일 새벽 녹화라 적은 편)'],mc:['음악중심',1,1,'선발 400명 · 예비 20명 · 신청 약 1950명 (주말이라 뮤직뱅크보다 약 150명 더)'],ig:['인기가요',1,1,'선발 280명 · 예비 20명 · 신청 약 1950명 (주말이라 뮤직뱅크보다 약 150명 더)'],pub:['공개방송',1,1,''],wk:['주말 공방',1.08,1.08,''],last:['막방',1.1,1.1,'평소보다 조금 더 몰림'],mini:['미팬',1.25,1.25,'가장 심하게 몰림']};
+// 방송별 값: pick=선발(거의 고정), rsv=예비 인원 후보(때마다 변동하면 둘 중 무작위), app=신청자 수
+// 신청자: 뮤직뱅크 선발 300(+예비 20)에 약 1800명 관측(2026-11-11). 음악중심·인기가요는 주말이라 100~200명 더 많다고 해서 중간값 +150명(1950명)으로 가정
+const SHOW={mb:{pick:300,rsv:[10,20],app:1800},mc:{pick:400,rsv:[20],app:1950},ig:{pick:280,rsv:[20],app:1950}};
 const r10=x=>Math.round(x/10)*10;
 // 선발 250명 이상은 기존 식, 그보다 적으면 신청자도 비례해서 크게 줄어듦(선발이 적을수록 한산)
 // 신청자는 선발 인원과 상관없이 최소 300명 (선발이 적어도 신청자는 300명 이상)
-// 관측(2026-11-11, 뮤직뱅크): 선발 320명에 신청 약 1800명 (기존 식은 1590명). 뮤직뱅크는 금요일 새벽 녹화라 직장인·지방 신청이 적은 편이고,
-// 주말 방송(음악중심·인기가요)은 100~200명 더 많음 → 'wk' 배율 1.08 (320명 기준 약 +140명)
+const appF=p=>p>=250?1500+(p-270)*1.8:1464*Math.pow(p/250,.8);
+// 방송별(SHOW)은 기본 선발 인원일 때 app명, 선발 인원을 바꾸면 기존 식(appF)의 비율로 증감. 막방·미팬은 기존 식 × 배율
 const APP_SCALE=1800/1590;
-const nApp=(p,k)=>Math.max(300,r10(Math.max(300,(p>=250?1500+(p-270)*1.8:1464*Math.pow(p/250,.8))*APP_SCALE)*KINDS[k][1]*(.97+Math.random()*.06)));
+const nApp=(p,k)=>{const s=SHOW[k],b=s?s.app*appF(p)/appF(s.pick):Math.max(300,appF(p)*APP_SCALE)*KINDS[k][1];return Math.max(300,r10(b*(.97+Math.random()*.06)))};
 /* 다른 신청자 1명의 서버 접수 시각(정각 대비 ms).
-   관측(2026-11-11, 공개방송): 선발 320명 → 320번째(마지막 합격) 접수 +1.289초. 예전 가정(선발 인원이 0.5초 안에 접수)은 요즘 딜레이와 맞지 않음.
-   선발 P명이 들어오는 시간 W를 P에 비례해 늘림: W = 150 + 1139·(P/320)^0.9 ms (P=320 → 약 1.29초, 관측 최소 접수가 약 150ms)
+   관측(2026-11-11, 뮤직뱅크): 선발 300+예비 20 = 총 320명 → 320번째(예비 마지막) 접수 +1.289초. 예전 가정(선발 인원이 0.5초 안에 접수)은 요즘 딜레이와 맞지 않음.
+   P = 선발+예비 총 인원. P명이 들어오는 시간 W를 P에 비례해 늘림: W = 150 + 1139·(P/320)^0.9 ms (P=320 → 약 1.29초, 관측 최소 접수가 약 150ms)
    종류별 혼잡(KINDS 배율)과 세션 서버 상태(curC)로 가감. N명 중 P/N 비율(약 ±5% 흔들림)은 W 안에 접수, 나머지는 W 뒤부터 긴 꼬리(가끔 1~3초 추가 지연)
    ※ W의 P 비례 지수(0.9)는 한 점(320명) 관측만으로 정한 가정이라, 다른 선발 인원 관측이 생기면 다시 맞출 것 */
 const winOf=(P,k)=>(150+1139*Math.pow(P/320,.9))*KINDS[k||'pub'][1]*Math.pow(curC,.8);
@@ -169,17 +173,19 @@ function home(){
  $('#best').innerHTML=`<div><small class="mu">최고 순위</small><b>${k.length?Math.min(...k.map(r=>r.rank))+'번째':'-'}</b></div><div><small class="mu">합격</small><b>${w.length?w.filter(r=>r.ok).length+' / '+w.length+'회':'-'}</b></div>`;
  $('#list').innerHTML=L.slice(0,8).map(r=>{const d=new Date(r.ts);return`<div class="rw"><div><b>${r.kind?KINDS[r.kind][0]:'정각'}</b><small>${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}</small></div><b>${label(r)}</b></div>`}).join('')||'<p class="mu" style="padding:14px 0">아직 기록이 없어요.</p>';
  show('home')}
-function sync(){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.k===kind));$('#kn').textContent=KINDS[kind][3]}
+function sync(){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.k===kind));$('#kn').textContent=KINDS[kind][3];
+ const s=SHOW[kind];$('#pk').placeholder=s?'자동 · '+s.pick+'명':'자동';$('#rv').placeholder=s?'자동 · '+s.rsv.join(' 또는 ')+'명':'자동 · 10명'}
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{kind=b.dataset.k;sync()});
 function setup(){sync();const d=new Date(Math.ceil((now()+30000)/60000)*60000);$('#t').value=`${pad(d.getHours())}:${pad(d.getMinutes())}`;show('setup');syncTime()}
 function quick(){window.QD=Math.ceil((now()+3000)/10000)*10000;start()}
 function start(){
  let d;if(window.QD){d=new Date(window.QD);window.QD=0}else{const[h,m]=$('#t').value.split(':').map(Number);d=new Date();d.setHours(h,m||0,0,0)}
  const rem=d-now();if(isNaN(rem)||rem<2000)return toast('지금보다 2초 이상 뒤의 시각을 정해 주세요');
- const pick=r10(+$('#pk').value)||(Math.random()<.8?r10(300+Math.random()*90):r10(250+Math.random()*50));curN=nApp(pick,kind);curC=Math.min(1.8,Math.max(.6,Math.exp(.25*gs()))); // 세션마다 서버 상태가 달라 같은 조건도 결과가 다름
- const r=R={tgt:performance.now()+rem,tgtAt:d.getTime(),pick,N:curN,kind};
+ const s=SHOW[kind],pick=r10(+$('#pk').value)||(s?s.pick:(Math.random()<.8?r10(300+Math.random()*90):r10(250+Math.random()*50)));
+ const rsv=Math.round(+$('#rv').value)||(s?s.rsv[Math.floor(Math.random()*s.rsv.length)]:10);curN=nApp(pick,kind);curC=Math.min(1.8,Math.max(.6,Math.exp(.25*gs()))); // 세션마다 서버 상태가 달라 같은 조건도 결과가 다름
+ const r=R={tgt:performance.now()+rem,tgtAt:d.getTime(),pick,rsv,N:curN,kind};
  document.querySelectorAll('.fi').forEach(i=>{i.value=i.defaultValue;i.classList.remove('err')});$('#ag1').checked=true;
- $('#cap').textContent=`${KINDS[kind][0]} · 선발 ${pick}명 · 예비 10명`;$('#sub').disabled=false;$('#sub').textContent='제출';$('#tg').textContent=fmtT(r.tgtAt);
+ $('#cap').textContent=`${KINDS[kind][0]} · 선발 ${pick}명 · 예비 ${rsv}명`;$('#sub').disabled=false;$('#sub').textContent='제출';$('#tg').textContent=fmtT(r.tgtAt);
  const f=()=>{if(R===r&&!r.done){$('#nw').textContent=fmtT(r.tgtAt+performance.now()-r.tgt);requestAnimationFrame(f)}};
  show('form');f()}
 $('#sub').onclick=e=>{
@@ -192,9 +198,9 @@ $('#sub').onclick=e=>{
  r.done=1;
  // 클릭 오차(ts-r.tgt)와 서버 지연(lat)은 별개: 서버 접수 = 클릭 + 서버 지연, 응답 수신 = 접수 + 회신 시간
  const tcl=(ts-r.tgt)/1000,L=curN*trf(tcl),lat=netLat(tcl),diff=ts+lat-r.tgt,down=20+Math.random()*50+lat*.04;
- const O=[];for(let i=1;i<r.N;i++)O.push(other(r.N,r.pick,r.kind));O.sort((a,b)=>a-b);
+ const O=[];for(let i=1;i<r.N;i++)O.push(other(r.N,r.pick+r.rsv,r.kind));O.sort((a,b)=>a-b);
   let rank=0;if(diff>=0){rank=1;for(const x of O){if(x<diff)rank++;else break}}
- const rec={id:Math.random().toString(36).slice(2,10),ts:Date.now(),mode:'exact',form:KINDS[r.kind][0]+' 참여 신청',kind:r.kind,diff,total:Math.abs(diff),bad:diff<0,lat,lvl:lvOf(L),load:Math.round(L),down,resp:lat+down,pick:r.pick,N:r.N,rank,ok:rank>0&&rank<=r.pick,tgtAt:r.tgtAt,click:ts-r.tgt,submitAt:r.tgtAt+ts-r.tgt};
+ const rec={id:Math.random().toString(36).slice(2,10),ts:Date.now(),mode:'exact',form:KINDS[r.kind][0]+' 참여 신청',kind:r.kind,diff,total:Math.abs(diff),bad:diff<0,lat,lvl:lvOf(L),load:Math.round(L),down,resp:lat+down,pick:r.pick,rsv:r.rsv,N:r.N,rank,ok:rank>0&&rank<=r.pick,tgtAt:r.tgtAt,click:ts-r.tgt,submitAt:r.tgtAt+ts-r.tgt};
  e.currentTarget.disabled=true;e.currentTarget.textContent='제출 중…';
  r.to=setTimeout(()=>{if(R!==r)return;addRec(rec);result(rec,O)},Math.min(lat+down,12000))};
 const fmtDT=ms=>{const d=new Date(ms);return`${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${fmtT(ms)}`};
@@ -215,9 +221,9 @@ function detail(r){
 function result(r,O){
  const all=O.map(x=>[x,0]);if(!r.bad)all.splice(r.rank-1,0,[r.diff,1]);
  let h=r.bad?row(r.tgtAt+r.diff,1,'무효'):'';
- all.forEach(([x,me],i)=>{h+=row(r.tgtAt+x,me,me?r.rank+'번째':'');if(i+1===r.pick)h+=`<div class="cut">▲ 선발 ${r.pick}명까지</div>`});
+ all.forEach(([x,me],i)=>{h+=row(r.tgtAt+x,me,me?r.rank+'번째':'');if(i+1===r.pick)h+=`<div class="cut">▲ 선발 ${r.pick}명까지</div>`;if(i+1===r.pick+r.rsv)h+=`<div class="cut">▲ 예비 ${r.rsv}명까지</div>`});
  $('#sm').innerHTML=(r.bad?`<b class="bad">무효</b><span>정각보다 ${fmtA(Math.round(-r.diff))} 일찍 접수돼 인정되지 않았어요</span>`
-  :`<b class="${r.ok?'ok':'no'}">${r.ok?'합격':r.rank<=r.pick+10?'예비':'탈락'} · ${r.rank}번째</b><span>${KINDS[r.kind||'pub'][0]} · 선발 ${r.pick}명 · 신청 ${all.length}명${all[r.pick-1]?` · 마지막 합격 접수 +${Math.round(all[r.pick-1][0])}ms`:''}</span>`)
+  :`<b class="${r.ok?'ok':'no'}">${r.ok?'합격':r.rank<=r.pick+r.rsv?'예비':'탈락'} · ${r.rank}번째</b><span>${KINDS[r.kind||'pub'][0]} · 선발 ${r.pick}명 · 신청 ${all.length}명${all[r.pick-1]?` · 마지막 합격 접수 +${Math.round(all[r.pick-1][0])}ms`:''}${all[r.pick+r.rsv-1]?` · 예비 끝(${r.pick+r.rsv}번째) +${Math.round(all[r.pick+r.rsv-1][0])}ms`:''}</span>`)
   ;$('#dt').innerHTML=detail(r);
  $('#cnt').textContent=`${O.length+(r.bad?0:1)}건 제출됨`;$('#ll').innerHTML=h;
  $('#jump').textContent=r.bad?'내 신청으로 이동':`내 신청으로 이동 · ${r.rank}번째`;show('lst')}
